@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func ValidateYear(year int) error {
+func ValidateAge(year int) error {
 	if year <= 0 || year > time.Now().Year()+1 {
 		return errors.New("year is not valid")
 	}

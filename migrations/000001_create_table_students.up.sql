@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS students (
   mail varchar(50),
   pasword varchar(50),
   created_at timestamp NOT NULL DEFAULT NOW(),
-  updated timestamp
+  updated timestamp,
+  active boolean
 );

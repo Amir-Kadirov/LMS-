@@ -3,18 +3,20 @@ package postgres
 import (
 	"backend_course/lms/api/models"
 	"backend_course/lms/pkg"
+	"context"
 	"database/sql"
 	"math/rand"
 	"strconv"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type studentRepo struct {
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
-func NewStudent(db *sql.DB) studentRepo {
+func NewStudent(db *pgxpool.Pool) studentRepo {
 	return studentRepo{
 		db: db,
 	}
@@ -26,10 +28,10 @@ func (s *studentRepo) Create(student models.Student) (string, error) {
 	student.ExternalId = strconv.Itoa(rand.Intn(999))
 
 	query := ` INSERT INTO students (id, first_name,last_name,age,external_id,
-		phone,mail,pasword, created_at) VALUES ($1, $2,$3,$4,$5,$6,$7,$8, NOW()) `
+		phone,mail,pasword,active, created_at) VALUES ($1, $2,$3,$4,$5,$6,$7,$8,$9, NOW()) `
 
-	_, err := s.db.Exec(query, id, student.FirstName, student.LastName, student.Age, student.ExternalId,
-		student.Phone, student.Mail, student.Pasword)
+	_, err := s.db.Exec(context.Background(), query, id, student.FirstName, student.LastName, student.Age, student.ExternalId,
+		student.Phone, student.Mail, student.Pasword, student.Active)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +59,7 @@ func (s *studentRepo) GetAll(req models.GetAllStudentsRequest) (models.GetAllStu
 				WHERE TRUE ` + filter + `
 				OFFSET $1 LIMIT $2
 					`
-	rows, err := s.db.Query(query, offest, req.Limit)
+	rows, err := s.db.Query(context.Background(), query, offest, req.Limit)
 	if err != nil {
 		return resp, err
 	}
@@ -81,14 +83,13 @@ func (s *studentRepo) GetAll(req models.GetAllStudentsRequest) (models.GetAllStu
 		resp.Students = append(resp.Students, student)
 	}
 
-	err = s.db.QueryRow(`SELECT count(*) from students WHERE TRUE ` + filter + ``).Scan(&resp.Count)
+	err = s.db.QueryRow(context.Background(), `SELECT count(*) from students WHERE TRUE `+filter+``).Scan(&resp.Count)
 	if err != nil {
 		return resp, err
 	}
 
 	return resp, nil
 }
-
 
 func (s *studentRepo) UpdateSt(student models.Student) (string, error) {
 
@@ -100,7 +101,7 @@ func (s *studentRepo) UpdateSt(student models.Student) (string, error) {
 								   updated = NOW()
 								       WHERE id = $6 `
 
-	_, err := s.db.Exec(query,
+	_, err := s.db.Exec(context.Background(), query,
 		student.FirstName,
 		student.LastName,
 		student.Age,
@@ -114,24 +115,31 @@ func (s *studentRepo) UpdateSt(student models.Student) (string, error) {
 	return student.Id, nil
 }
 
-func (s *studentRepo) UpdateStPassword(student models.Student) (string, error) {
+func (s *studentRepo) UpdateStPassword(id string, password string) (string, error) {
 
 	query := ` UPDATE students set pasword = $1,updated = NOW() WHERE id = $2 `
 
-	_, err := s.db.Exec(query, student.Pasword, student.Id)
+	_, err := s.db.Exec(context.Background(), query, password, id)
 	if err != nil {
 		return "", err
 	}
 
-	return student.Id, nil
+	return password, nil
 }
 
-func (s *studentRepo) GetById(student models.GetByIdRequest) (models.GetStudent, error) {
+func (s *studentRepo) GetById(ExternalId string) (models.GetStudent, error) {
 	resp := models.GetStudent{}
 
-	query := `select id,first_name,last_name,age,external_id,phone,mail from students where external_id=$1`
+	query := `SELECT id,
+	          first_name,
+			  last_name,
+			  age,
+			  external_id,
+			  phone,
+			  mail 
+			  FROM students WHERE external_id=$1`
 
-	row := s.db.QueryRow(query, student.ExternalId)
+	row := s.db.QueryRow(context.Background(), query, ExternalId)
 
 	err := row.Scan(&resp.Id, &resp.FirstName, &resp.LastName, &resp.Age, &resp.ExternalId, &resp.Phone, &resp.Mail)
 
@@ -142,15 +150,30 @@ func (s *studentRepo) GetById(student models.GetByIdRequest) (models.GetStudent,
 	return resp, nil
 }
 
+func (s *studentRepo) DeleteSt(external_id string) error {
 
-func (s *studentRepo) DeleteSt(student models.Student) (string, error) {
+	query := `DELETE FROM students WHERE external_id = $1 `
 
-	query := `DELETE FROM students WHERE id = $1 `
-
-	_, err := s.db.Exec(query,student.Id)
+	_, err := s.db.Exec(context.Background(), query, external_id)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return student.Id, nil
+	return nil
+}
+
+func (s *studentRepo) StatusSt(id string) (models.IsActiveResponse, error) {
+
+	req := models.IsActiveResponse{}
+
+	query := `SELECT active FROM students where id=$1`
+
+	row := s.db.QueryRow(context.Background(), query, id)
+
+	err := row.Scan(&req.Active)
+	if err != nil {
+		return req, err
+	}
+
+	return req, nil
 }

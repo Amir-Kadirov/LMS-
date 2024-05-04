@@ -1,2 +1,0 @@
-ALTER TABLE IF EXISTS students1
-    ADD COLUMN IF NOT EXISTS is_blocked boolean DEFAULT FALSE;
