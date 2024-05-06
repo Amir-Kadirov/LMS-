@@ -5,6 +5,7 @@ import (
 	"backend_course/lms/pkg"
 	"context"
 	"database/sql"
+	"fmt"
 	"math/rand"
 	"strconv"
 
@@ -144,10 +145,42 @@ func (s *studentRepo) GetById(ExternalId string) (models.GetStudent, error) {
 	err := row.Scan(&resp.Id, &resp.FirstName, &resp.LastName, &resp.Age, &resp.ExternalId, &resp.Phone, &resp.Mail)
 
 	if err != nil {
+		fmt.Println("error")
 		return resp, err
 	}
 
-	return resp, nil
+	querySubTimeTab := `SELECT sub.name,
+	                         sub.type,
+							 to_char(tt.start_date,'YYYY-MM-DD HH:MM:SS'),
+							 to_char(tt.end_date,'YYYY-MM-DD HH:MM:SS'),
+							 t.first_name 
+							 FROM time_tables tt 
+							   INNER JOIN teacher t ON t.id=tt.teacher_id
+							   INNER JOIN subjects sub ON sub.id=tt.subject_id
+							   WHERE tt.student_id=$1`
+
+	rows, err := s.db.Query(context.Background(), querySubTimeTab, resp.Id)
+	if err != nil {
+		return resp, err
+	}
+	for rows.Next() {
+		teacher := models.StudentTeacher{}
+		subject := models.StudentSubjects{}
+		timetable := models.StudentTimeTable{}
+		if err := rows.Scan(
+			&subject.Name,
+			&subject.Type,
+			&timetable.StartDate,
+			&timetable.EndDate,
+			&teacher.Name,
+		); err != nil {
+			return resp, err
+		}
+		resp.Subjects = append(resp.Subjects, subject)
+		resp.TimeTable = append(resp.TimeTable, timetable)
+		resp.Teacher = append(resp.Teacher, teacher)
+	}
+	return resp,nil
 }
 
 func (s *studentRepo) DeleteSt(external_id string) error {

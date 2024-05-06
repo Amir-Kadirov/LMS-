@@ -40,7 +40,7 @@ func (h Handler) CreateStudent(c *gin.Context) {
 		return
 	}
 
-	id, err := h.Store.StudentStorage().Create(student)
+	id, err := h.Service.Student().Create(student)
 	if err != nil {
 		handleResponse(c, "error while creating student", http.StatusBadRequest, err.Error())
 		return
@@ -74,7 +74,7 @@ func (h Handler) UpdateStudent(c *gin.Context) {
 
 	student.Id = id
 
-	id, err := h.Store.StudentStorage().UpdateSt(student)
+	id, err := h.Service.Student().UpdateStudent(student)
 	if err != nil {
 		handleResponse(c, "error while updating student", http.StatusInternalServerError, err.Error())
 		return
@@ -106,7 +106,7 @@ func (h Handler) GetAllStudents(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.Store.StudentStorage().GetAll(models.GetAllStudentsRequest{
+	resp, err := h.Service.Student().GetAllStudent(models.GetAllStudentsRequest{
 		Search: search,
 		Page:   page,
 		Limit:  limit,
@@ -137,7 +137,7 @@ func (h Handler) UpdateStudentPassword(c *gin.Context) {
 		return
 	}
 
-	id, err := h.Store.StudentStorage().UpdateStPassword(id, password)
+	id, err := h.Service.Student().UpdatePassword(id,password)
 	if err != nil {
 		handleResponse(c, "Error while updating student password", http.StatusInternalServerError, err.Error())
 		return
@@ -159,7 +159,7 @@ func (h Handler) UpdateStudentPassword(c *gin.Context) {
 func (h Handler) GetById(c *gin.Context) {
 	id := c.Param("id")
 
-	data, err := h.Store.StudentStorage().GetById(id)
+	data, err := h.Service.Student().GetByIdStudent(id)
 	if err != nil {
 		handleResponse(c, fmt.Sprintf("error while get by id student %s", id), http.StatusInternalServerError, err.Error())
 		return
@@ -182,7 +182,7 @@ func (h Handler) DeleteStudent(c *gin.Context) {
 
 	ExternalId:= c.Param("id")
 
-	err := h.Store.StudentStorage().DeleteSt(ExternalId)
+	err := h.Service.Student().DeleteStudent(ExternalId)
 	if err != nil {
 		handleResponse(c, "error while deleting  student", http.StatusInternalServerError, err.Error())
 		return

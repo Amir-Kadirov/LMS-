@@ -34,7 +34,7 @@ func (h Handler) CreateTeacher(c *gin.Context) {
 		return
 	}
 
-	id, err := h.Store.TeacherStorage().CreateTeacher(teacher)
+	id, err := h.Service.Teacher().CreateTeacher(teacher)
 	if err != nil {
 		handleResponse(c, "error while creating teacher", http.StatusBadRequest, err.Error())
 		return
@@ -68,7 +68,7 @@ func (h Handler) UpdateTeacher(c *gin.Context) {
 
 	teacher.Id = id
 
-	err := h.Store.TeacherStorage().UpdateTeacher(teacher)
+	err := h.Service.Teacher().UpdateTeacher(teacher)
 	if err != nil {
 		handleResponse(c, fmt.Sprintf("error while updating teacher %s", teacher.Id), http.StatusInternalServerError, err.Error())
 		return
@@ -100,7 +100,7 @@ func (h Handler) GetAllTeacher(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.Store.TeacherStorage().GetAllTeacher(models.GetAllStudentsRequest{
+	resp, err := h.Service.Teacher().GetAllTeacher(models.GetAllStudentsRequest{
 		Search: search,
 		Page:   page,
 		Limit:  limit,
@@ -125,7 +125,7 @@ func (h Handler) GetAllTeacher(c *gin.Context) {
 func (h Handler) GetByIdTeacher(c *gin.Context) {
 	id := c.Param("id")
 
-	data, err := h.Store.TeacherStorage().GetTeacherbyId(id)
+	data, err := h.Service.Teacher().GetTeacherbyId(id)
 	if err != nil {
 		handleResponse(c, fmt.Sprintf("error while get by id teacher %s", id), http.StatusInternalServerError, err.Error())
 		return
@@ -148,7 +148,7 @@ func (h Handler) DeleteTeacher(c *gin.Context) {
 
 	id := c.Param("id")
 
-	err := h.Store.TeacherStorage().DeleteTeacher(id)
+	err := h.Service.Teacher().DeleteTeacher(id)
 	if err != nil {
 		handleResponse(c, "error while deleting teacher", http.StatusInternalServerError, err.Error())
 		return

@@ -51,3 +51,15 @@ func (s Store) TeacherStorage() storage.TeacherStorage {
 
 	return &newTeacher
 }
+
+func (s Store) SubjectStorage() storage.SubjectStorage {
+	newSubject:=NewSubject(s.Pool)
+
+	return &newSubject
+}
+
+func (s Store) TimeTableStorage() storage.TimeTableStorage {
+	newTimeTable:=NewTimeTable(s.Pool)
+
+	return &newTimeTable
+}

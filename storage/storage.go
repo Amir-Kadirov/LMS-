@@ -6,6 +6,8 @@ type IStorage interface {
 	CloseDB()
 	StudentStorage() StudentStorage
 	TeacherStorage() TeacherStorage
+	SubjectStorage() SubjectStorage
+	TimeTableStorage() TimeTableStorage
 }
 
 type StudentStorage interface {
@@ -24,4 +26,16 @@ type TeacherStorage interface {
 	GetAllTeacher(req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error)
 	GetTeacherbyId(id string) (models.Teacher, error)
 	DeleteTeacher(id string) error
+}
+
+type SubjectStorage interface {
+	CreateSubject(subject models.Subjects) (string, error)
+	UpadateSubject(subject models.Subjects) error
+	GetbyIdSubject(id string) (models.Subjects, error)
+	DeleteSubject(id string) error
+}
+
+type TimeTableStorage interface {
+	DeleteTimeTable(id string) error
+	CreateTimeTable(timeTable models.TimeTable) (string, error)
 }
