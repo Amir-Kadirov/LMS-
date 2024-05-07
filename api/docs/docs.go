@@ -358,6 +358,42 @@ const docTemplate = `{
             }
         },
         "/subject": {
+            "get": {
+                "description": "This API returns all Subject",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "summary": "Get a Subject",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "This api creates a subject and returns its id",
                 "consumes": [
@@ -458,7 +494,7 @@ const docTemplate = `{
         },
         "/subject/updatesubject/{id}": {
             "put": {
-                "description": "This API updates a Teacher",
+                "description": "This API updates a Subject",
                 "consumes": [
                     "application/json"
                 ],

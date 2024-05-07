@@ -36,16 +36,17 @@ func (t teacherRepo) CreateTeacher(teacher models.Teacher) (string, error) {
 	return id.String(), nil
 }
 
-func (t teacherRepo) UpdateTeacher(teacher models.Teacher) error {
+func (t teacherRepo) UpdateTeacher(teacher models.Teacher) (string,error) {
 	query := `UPDATE teacher SET first_name=$1,last_name=$2,start_work=$3,phone=$4,mail=$5,updated=NOW() WHERE id=$6`
 
 	_, err := t.db.Exec(context.Background(), query, teacher.FirstName, teacher.LastName,
 		teacher.StartWork, teacher.Phone, teacher.Mail, teacher.Id)
 	if err != nil {
-		return err
+		return "",err
 	}
 
-	return nil
+
+	return teacher.Id,nil
 }
 
 func (t teacherRepo) GetAllTeacher(req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error) {
@@ -100,8 +101,8 @@ func (t teacherRepo) GetAllTeacher(req models.GetAllStudentsRequest) (models.Get
 	return resp, nil
 }
 
-func (t teacherRepo) GetTeacherbyId(id string) (models.Teacher, error) {
-	resp := models.Teacher{}
+func (t teacherRepo) GetTeacherbyId(id string) (models.GetByIdTeacher, error) {
+	resp := models.GetByIdTeacher{}
 	query := `SELECT id,
 	first_name,
 	last_name,
@@ -117,7 +118,40 @@ func (t teacherRepo) GetTeacherbyId(id string) (models.Teacher, error) {
 		return resp, err
 	}
 
-	return resp, nil
+	querySubTimeTab := `SELECT sub.name,
+	                         sub.type,
+							 to_char(tt.start_date,'YYYY-MM-DD HH:MM:SS'),
+							 to_char(tt.end_date,'YYYY-MM-DD HH:MM:SS'),
+							 s.first_name,
+							 s.last_name
+							 FROM time_tables tt 
+							   INNER JOIN students s ON s.id=tt.student_id
+							   INNER JOIN subjects sub ON sub.id=tt.subject_id
+							   WHERE tt.teacher_id=$1`
+
+	rows, err := t.db.Query(context.Background(), querySubTimeTab, resp.Id)
+	if err != nil {
+		return resp, err
+	}
+	for rows.Next() {
+		student:=models.TeacherStudent{}
+		subject := models.TeacherSubjects{}
+		timetable := models.TeacherTimeTable{}
+		if err := rows.Scan(
+			&subject.Name,
+			&subject.Type,
+			&timetable.StartDate,
+			&timetable.EndDate,
+			&student.FirstName,
+			&student.LastName,
+		); err != nil {
+			return resp, err
+		}
+		resp.Subjects = append(resp.Subjects, subject)
+		resp.TimeTable = append(resp.TimeTable, timetable)
+		resp.Student = append(resp.Student, student)
+	}
+	return resp,nil
 }
 
 func (t teacherRepo) DeleteTeacher(id string) error {

@@ -306,6 +306,30 @@ paths:
       tags:
       - student
   /subject:
+    get:
+      description: This API returns all Subject
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get a Subject
+      tags:
+      - Subject
     post:
       consumes:
       - application/json
@@ -405,7 +429,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: This API updates a Teacher
+      description: This API updates a Subject
       parameters:
       - description: Subject ID
         in: path

@@ -26,7 +26,7 @@ func (t teacherService) CreateTeacher(teacher models.Teacher) (string, error) {
 }
 
 func (t teacherService) UpdateTeacher(teacher models.Teacher) error {
-	err := t.storage.TeacherStorage().UpdateTeacher(teacher)
+	_,err := t.storage.TeacherStorage().UpdateTeacher(teacher)
 	if err != nil {
 		fmt.Println("error while updating teacher:", err)
 		return err
@@ -45,7 +45,7 @@ func (t teacherService) GetAllTeacher(req models.GetAllStudentsRequest) (models.
 	return teachers,nil
 }
 
-func (t teacherService) GetTeacherbyId(id string) (models.Teacher, error) {
+func (t teacherService) GetTeacherbyId(id string) (models.GetByIdTeacher, error) {
 	teacher,err:=t.storage.TeacherStorage().GetTeacherbyId(id)
 	if err!=nil {
 		fmt.Println("error while get by id teacher:",err)

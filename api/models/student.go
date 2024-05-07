@@ -51,7 +51,7 @@ type GetAllStudentsRequest struct {
 
 type GetAllStudentsResponse struct {
 	Students []GetStudent `json:"students"`
-	Count    int64        `json:"count"`
+	Count    int        `json:"count"`
 }
 
 type IsActiveResponse struct {

@@ -128,7 +128,7 @@ func (s *studentRepo) UpdateStPassword(id string, password string) (string, erro
 	return password, nil
 }
 
-func (s *studentRepo) GetById(ExternalId string) (models.GetStudent, error) {
+func (s *studentRepo) GetById(id string) (models.GetStudent, error) {
 	resp := models.GetStudent{}
 
 	query := `SELECT id,
@@ -138,9 +138,9 @@ func (s *studentRepo) GetById(ExternalId string) (models.GetStudent, error) {
 			  external_id,
 			  phone,
 			  mail 
-			  FROM students WHERE external_id=$1`
+			  FROM students WHERE id=$1`
 
-	row := s.db.QueryRow(context.Background(), query, ExternalId)
+	row := s.db.QueryRow(context.Background(), query, id)
 
 	err := row.Scan(&resp.Id, &resp.FirstName, &resp.LastName, &resp.Age, &resp.ExternalId, &resp.Phone, &resp.Mail)
 
@@ -183,11 +183,11 @@ func (s *studentRepo) GetById(ExternalId string) (models.GetStudent, error) {
 	return resp,nil
 }
 
-func (s *studentRepo) DeleteSt(external_id string) error {
+func (s *studentRepo) DeleteSt(id string) error {
 
-	query := `DELETE FROM students WHERE external_id = $1 `
+	query := `DELETE FROM students WHERE id = $1 `
 
-	_, err := s.db.Exec(context.Background(), query, external_id)
+	_, err := s.db.Exec(context.Background(), query, id)
 	if err != nil {
 		return err
 	}

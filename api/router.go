@@ -38,6 +38,7 @@ func New(store storage.IStorage,service service.IServiceManager) *gin.Engine {
 	r.GET("/subject/:id", h.GetbyIdSubject)
 	r.PUT("/subject/updatesubject/:id",h.UpdateSubject)
 	r.DELETE("/subject/deletsubject/:id",h.DeleteSubject)
+	r.GET("/subject", h.GetAllSubject)
 
 	r.POST("/timetable",h.CreateTimeTable)
 	r.DELETE("/timetable/:id",h.DeleteTimeTable)

@@ -26,7 +26,7 @@ func (t subjectService) CreateSubject(subjects models.Subjects) (string, error) 
 }
 
 func (t subjectService) UpdateSubject(subject models.Subjects) error {
-	err:=t.storage.SubjectStorage().UpadateSubject(subject)	
+	_,err:=t.storage.SubjectStorage().UpadateSubject(subject)	
 	if err!=nil {
 		return err
 	}
@@ -51,4 +51,15 @@ func (t subjectService) DeleteSubject(id string) error {
 	}
 
 	return nil
+}
+
+func (t subjectService) GetAllSubject(req models.GetAllStudentsRequest) (models.SubjectGetAll, error) {
+
+	subject,err:=t.storage.SubjectStorage().GetAllSubject(req)
+	if err!=nil {
+		fmt.Println("error while get all subject:",err)
+		return subject,err
+	}
+
+	return subject,nil
 }

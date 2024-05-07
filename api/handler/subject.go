@@ -61,7 +61,7 @@ func (h Handler) GetbyIdSubject(c *gin.Context) {
 
 // @Router		/subject/updatesubject/{id} [put]
 // @Summary		Update a subject
-// @Description	This API updates a Teacher
+// @Description	This API updates a Subject
 // @Tags		Subject
 // @Accept		json
 // @Produce		json
@@ -75,7 +75,7 @@ func (h Handler) UpdateSubject(c *gin.Context) {
 
 	id := c.Param("id")
 
-	subject:=models.Subjects{}
+	subject := models.Subjects{}
 
 	if err := c.ShouldBindJSON(&subject); err != nil {
 		handleResponse(c, "error while reading request body", http.StatusBadRequest, err.Error())
@@ -105,7 +105,7 @@ func (h Handler) UpdateSubject(c *gin.Context) {
 // @Failure		500 {object} models.Response
 func (h Handler) DeleteSubject(c *gin.Context) {
 
-	Id:= c.Param("id")
+	Id := c.Param("id")
 
 	err := h.Service.Subject().DeleteSubject(Id)
 	if err != nil {
@@ -114,4 +114,39 @@ func (h Handler) DeleteSubject(c *gin.Context) {
 	}
 
 	handleResponse(c, "Subject deleted successfully", http.StatusOK, err)
+}
+
+// @Router		/subject [get]
+// @Summary		Get a Subject
+// @Description	This API returns all Subject
+// @Tags		Subject
+// @Produce		json
+// @Success		200  {object}  models.Response
+// @Failure		400  {object}  models.Response
+// @Failure		404  {object}  models.Response
+// @Failure		500  {object}  models.Response
+func (h Handler) GetAllSubject(c *gin.Context) {
+	search := c.Query("search")
+
+	page, err := ParsePageQueryParam(c)
+	if err != nil {
+		handleResponse(c, "error while parsing page", http.StatusBadRequest, err.Error())
+		return
+	}
+	limit, err := ParseLimitQueryParam(c)
+	if err != nil {
+		handleResponse(c, "error while parsing limit", http.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp, err := h.Service.Subject().GetAllSubject(models.GetAllStudentsRequest{
+		Search: search,
+		Page:   page,
+		Limit:  limit,
+	})
+	if err != nil {
+		handleResponse(c, "error while getting all Subject", http.StatusInternalServerError, err.Error())
+		return
+	}
+	handleResponse(c, "Select all successful", http.StatusOK, resp)
 }
