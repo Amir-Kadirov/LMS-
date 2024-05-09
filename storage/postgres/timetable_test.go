@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"backend_course/lms/api/models"
+	"context"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
@@ -14,21 +15,21 @@ func TestCreateTimeTable(t *testing.T) {
 	reqTimeTable := models.TimeTable{
 		FromDate: faker.Timestamp(),
 		ToDate: faker.Timestamp(),
-		TeacherId: "21d80a3d-6be4-4497-a5cf-a0d472b6d246",
-		SubjectId: "37f19649-eb98-4924-9ddb-be778f3bd3b8",
-		StudentId: "107cbb6a-00fa-49d8-b959-a8a71aab72c5",
+		TeacherId: "90c97fc8-6c37-471f-b52a-4636d8036a4c",
+		SubjectId: "4cae2595-12d8-424e-81bb-0bd7507ddde1",
+		StudentId: "4a481ea4-777d-406d-8882-969716570ca1",
 	}
 
-	_, err := TimeTableRepo.CreateTimeTable(reqTimeTable)
+	_, err := TimeTableRepo.CreateTimeTable(context.Background(),reqTimeTable)
 	assert.NoError(t, err,"Created Time Table") 
 	}
 
 func TestDeleteTimeTable(t *testing.T) {
 	TimeTableRepo := NewTimeTable(db)
 
-	id := "a0e27142-e55e-44ab-b292-5880f79b4243"
+	id := "64dc0907-c7cf-4b98-8480-9cd23edd4d20"
 
-	err := TimeTableRepo.DeleteTimeTable(id)
+	err := TimeTableRepo.DeleteTimeTable(context.Background(),id)
 	if assert.NoError(t, err) {
 		return
 	}

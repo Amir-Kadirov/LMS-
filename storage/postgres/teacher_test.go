@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"backend_course/lms/api/models"
+	"context"
 	"fmt"
 	"testing"
 
@@ -18,9 +19,9 @@ func TestCreateTeacher(t *testing.T) {
 		LastName:  faker.Word(),
 	}
 
-	id, err := teacherRepo.CreateTeacher(reqTeacher)
+	id, err := teacherRepo.CreateTeacher(context.Background() ,reqTeacher)
 	if assert.NoError(t, err) {
-		createdTeacher, err := teacherRepo.GetTeacherbyId(id)
+		createdTeacher, err := teacherRepo.GetTeacherbyId(context.Background(),id)
 		if assert.NoError(t, err) {
 			assert.Equal(t, reqTeacher.FirstName, createdTeacher.FirstName)
 			assert.Equal(t, reqTeacher.Phone, createdTeacher.Phone)
@@ -39,11 +40,11 @@ func TestUpdateTeacher(t *testing.T) {
 		FirstName: faker.Name(),
 		LastName:  faker.Name(),
 		Mail:      "new mail",
-		Id:        "3ed68793-cd2a-4c0a-9358-0eb2faa05cf5",
+		Id:        "c63fce30-58e0-477a-aec9-47f9d2d6ef4b",
 	}
-	id, err := teacherRepo.UpdateTeacher(updateTeacher)
+	id, err := teacherRepo.UpdateTeacher(context.Background(),updateTeacher)
 	if assert.NoError(t, err) {
-		updatedTeacher, err := teacherRepo.GetTeacherbyId(id)
+		updatedTeacher, err := teacherRepo.GetTeacherbyId(context.Background(),id)
 		if assert.NoError(t, err) {
 			assert.Equal(t, updateTeacher.FirstName, updatedTeacher.FirstName)
 			assert.Equal(t, updateTeacher.LastName, updatedTeacher.LastName)
@@ -55,11 +56,11 @@ func TestUpdateTeacher(t *testing.T) {
 func TestDeleteTeacher(t *testing.T) {
 	teacherRepo := NewTeacher(db)
 
-	id := "a0e27142-e55e-44ab-b292-5880f79b4243"
+	id := "fc0fe842-09dd-4e9b-b105-8d740174bbbe"
 
-	erDr := teacherRepo.DeleteTeacher(id)
+	erDr := teacherRepo.DeleteTeacher(context.Background(),id)
 	if assert.NoError(t, erDr) {
-		_, err := teacherRepo.GetTeacherbyId(id)
+		_, err := teacherRepo.GetTeacherbyId(context.Background(),id)
 		assert.Error(t, err, err)
 	}
 }
@@ -77,13 +78,13 @@ func TestGetAllTeacher(t *testing.T) {
 		Limit:  10,
 	}
 
-	_, err := teacherRepo.CreateTeacher(reqTeacher)
-	oldCount, _ := teacherRepo.GetAllTeacher(getAllreq)
+	_, err := teacherRepo.CreateTeacher(context.Background(),reqTeacher)
+	oldCount, _ := teacherRepo.GetAllTeacher(context.Background(),getAllreq)
 
 	if assert.NoError(t, err) {
-		_, err = teacherRepo.CreateTeacher(reqTeacher)
+		_, err = teacherRepo.CreateTeacher(context.Background(),reqTeacher)
 		if assert.NoError(t, err) {
-			newcount, _ := teacherRepo.GetAllTeacher(getAllreq)
+			newcount, _ := teacherRepo.GetAllTeacher(context.Background(),getAllreq)
 			assert.Equal(t, 1, newcount.Count-oldCount.Count)
 		}
 	}

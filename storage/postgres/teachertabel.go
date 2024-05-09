@@ -18,11 +18,11 @@ func NewTimeTable(db *pgxpool.Pool) timetableREpo {
 	}
 }
 
-func (t timetableREpo) CreateTimeTable(timeTable models.TimeTable) (string, error) {
+func (t timetableREpo) CreateTimeTable(ctx context.Context,timeTable models.TimeTable) (string, error) {
 	id := uuid.New()
 
 	query:=`INSERT INTO time_tables(id,teacher_id,student_id,subject_id,start_date,end_date) VALUES($1,$2,$3,$4,$5,$6)`
-	_,err:=t.db.Exec(context.Background(),query,id,timeTable.TeacherId,timeTable.StudentId,timeTable.SubjectId,timeTable.FromDate,timeTable.ToDate)
+	_,err:=t.db.Exec(ctx,query,id,timeTable.TeacherId,timeTable.StudentId,timeTable.SubjectId,timeTable.FromDate,timeTable.ToDate)
 	if err!=nil {
 		return "",err
 	}
@@ -30,9 +30,9 @@ func (t timetableREpo) CreateTimeTable(timeTable models.TimeTable) (string, erro
 	return id.String(),nil
 }
 
-func (t timetableREpo) DeleteTimeTable(id string) error {
+func (t timetableREpo) DeleteTimeTable(ctx context.Context,id string) error {
 	query:=`DELETE FROM time_tables WHERE id=$1`
-	_,err:=t.db.Exec(context.Background(),query,id)
+	_,err:=t.db.Exec(ctx,query,id)
 	if err!=nil {
 		return err
 	}

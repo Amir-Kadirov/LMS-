@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"backend_course/lms/api/models"
+	"context"
 	"fmt"
 	"testing"
 
@@ -18,9 +19,9 @@ func TestCreateStudent(t *testing.T) {
 		LastName:  faker.Word(),
 	}
 
-	id, err := studentRepo.Create(reqStudent)
+	id, err := studentRepo.Create(context.Background(),reqStudent)
 	if assert.NoError(t, err) {
-		createdStudent, err := studentRepo.GetById(id)
+		createdStudent, err := studentRepo.GetById(context.Background(),id)
 		if assert.NoError(t, err) {
 			assert.Equal(t, reqStudent.FirstName, createdStudent.FirstName)
 			assert.Equal(t, reqStudent.Age, createdStudent.Age)
@@ -40,11 +41,12 @@ func TestUpdateStudent(t *testing.T) {
 		LastName:  faker.Name(),
 		Age:       15,
 		Mail:      "new mail",
-		Id:        "a0e27142-e55e-44ab-b292-5880f79b4243",
+		Id:        "7dfc00b2-376d-4db8-80ad-eb35e194c561",
 	}
-	id, err := studentRepo.UpdateSt(updateStudent)
+
+	id, err := studentRepo.UpdateSt(context.Background(),updateStudent)
 	if assert.NoError(t, err) {
-		updatedStudent, err := studentRepo.GetById(id)
+		updatedStudent, err := studentRepo.GetById(context.Background(),id)
 		if assert.NoError(t, err) {
 			assert.Equal(t, updateStudent.FirstName, updatedStudent.FirstName)
 			assert.Equal(t, updateStudent.LastName, updatedStudent.LastName)
@@ -57,11 +59,11 @@ func TestUpdateStudent(t *testing.T) {
 func TestDeleteStudent(t *testing.T) {
 	studentRepo := NewStudent(db)
 
-	id := "a0e27142-e55e-44ab-b292-5880f79b4243"
+	id := "68afa24d-959c-44ce-add7-6e5974e04b37"
 
-	erDr := studentRepo.DeleteSt(id)
+	erDr := studentRepo.DeleteSt(context.Background(),id)
 	if assert.NoError(t, erDr) {
-		_, err := studentRepo.GetById(id)
+		_, err := studentRepo.GetById(context.Background(),id)
 		assert.Error(t, err, err)
 	}
 }
@@ -80,14 +82,39 @@ func TestGetAllStudent(t *testing.T) {
 		Limit:  10,
 	}
 
-	_, err := studentRepo.Create(reqStudent)
-	oldCount, _ := studentRepo.GetAll(getAllreq)
+	_, err := studentRepo.Create(context.Background(),reqStudent)
+	oldCount, _ := studentRepo.GetAll(context.Background(),getAllreq)
 
 	if assert.NoError(t, err) {
-		_, err = studentRepo.Create(reqStudent)
+		_, err = studentRepo.Create(context.Background(),reqStudent)
 		if assert.NoError(t, err) {
-			newcount, _ := studentRepo.GetAll(getAllreq)
+			newcount, _ := studentRepo.GetAll(context.Background(),getAllreq)
 			assert.Equal(t, 1, newcount.Count-oldCount.Count)
 		}
+	}
+}
+
+func TestStatusStudent(t *testing.T) {
+    stRepo := NewStudent(db)
+    isactive, err := stRepo.StatusSt(context.Background(), "7dfc00b2-376d-4db8-80ad-eb35e194c561")
+    if assert.NoError(t, err) {
+        if isactive.Active {
+            assert.True(t, isactive.Active, "Expected student to be active")
+        } else {
+            assert.False(t, isactive.Active, "Expected student to be inactive")
+        }
+    }
+}
+
+
+func TestUpdatePassword(t *testing.T) {
+	studentRepo := NewStudent(db)
+
+	id := "68afa24d-959c-44ce-add7-6e5974e04b37"
+	password:="New Password"
+
+	newpassword,erDr := studentRepo.UpdateStPassword(context.Background(),id,password)
+	if assert.NoError(t, erDr) {
+		assert.Equal(t,password,newpassword)
 	}
 }

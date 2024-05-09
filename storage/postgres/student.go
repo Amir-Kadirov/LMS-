@@ -3,6 +3,7 @@ package postgres
 import (
 	"backend_course/lms/api/models"
 	"backend_course/lms/pkg"
+	smtp "backend_course/lms/pkg/helper"
 	"context"
 	"database/sql"
 	"fmt"
@@ -23,7 +24,7 @@ func NewStudent(db *pgxpool.Pool) studentRepo {
 	}
 }
 
-func (s *studentRepo) Create(student models.Student) (string, error) {
+func (s *studentRepo) Create(ctx context.Context,student models.Student) (string, error) {
 
 	id := uuid.New()
 	student.ExternalId = strconv.Itoa(rand.Intn(999))
@@ -31,16 +32,21 @@ func (s *studentRepo) Create(student models.Student) (string, error) {
 	query := ` INSERT INTO students (id, first_name,last_name,age,external_id,
 		phone,mail,pasword,active, created_at) VALUES ($1, $2,$3,$4,$5,$6,$7,$8,$9, NOW()) `
 
-	_, err := s.db.Exec(context.Background(), query, id, student.FirstName, student.LastName, student.Age, student.ExternalId,
+	_, err := s.db.Exec(ctx, query, id, student.FirstName, student.LastName, student.Age, student.ExternalId,
 		student.Phone, student.Mail, student.Pasword, student.Active)
 	if err != nil {
 		return "", err
 	}
 
+	err=smtp.SendMail(student.Mail,"Welcome new student")
+	if err!=nil {
+		return "",err
+	}
+
 	return id.String(), nil
 }
 
-func (s *studentRepo) GetAll(req models.GetAllStudentsRequest) (models.GetAllStudentsResponse, error) {
+func (s *studentRepo) GetAll(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllStudentsResponse, error) {
 	resp := models.GetAllStudentsResponse{}
 	filter := ""
 	offest := (req.Page - 1) * req.Limit
@@ -60,7 +66,7 @@ func (s *studentRepo) GetAll(req models.GetAllStudentsRequest) (models.GetAllStu
 				WHERE TRUE ` + filter + `
 				OFFSET $1 LIMIT $2
 					`
-	rows, err := s.db.Query(context.Background(), query, offest, req.Limit)
+	rows, err := s.db.Query(ctx, query, offest, req.Limit)
 	if err != nil {
 		return resp, err
 	}
@@ -84,7 +90,7 @@ func (s *studentRepo) GetAll(req models.GetAllStudentsRequest) (models.GetAllStu
 		resp.Students = append(resp.Students, student)
 	}
 
-	err = s.db.QueryRow(context.Background(), `SELECT count(*) from students WHERE TRUE `+filter+``).Scan(&resp.Count)
+	err = s.db.QueryRow(ctx, `SELECT count(*) from students WHERE TRUE `+filter+``).Scan(&resp.Count)
 	if err != nil {
 		return resp, err
 	}
@@ -92,7 +98,7 @@ func (s *studentRepo) GetAll(req models.GetAllStudentsRequest) (models.GetAllStu
 	return resp, nil
 }
 
-func (s *studentRepo) UpdateSt(student models.Student) (string, error) {
+func (s *studentRepo) UpdateSt(ctx context.Context,student models.Student) (string, error) {
 
 	query := ` UPDATE students set first_name=$1,
 								   last_name=$2,
@@ -102,7 +108,7 @@ func (s *studentRepo) UpdateSt(student models.Student) (string, error) {
 								   updated = NOW()
 								       WHERE id = $6 `
 
-	_, err := s.db.Exec(context.Background(), query,
+	_, err := s.db.Exec(ctx, query,
 		student.FirstName,
 		student.LastName,
 		student.Age,
@@ -116,7 +122,7 @@ func (s *studentRepo) UpdateSt(student models.Student) (string, error) {
 	return student.Id, nil
 }
 
-func (s *studentRepo) UpdateStPassword(id string, password string) (string, error) {
+func (s *studentRepo) UpdateStPassword(ctx context.Context,id string, password string) (string, error) {
 
 	query := ` UPDATE students set pasword = $1,updated = NOW() WHERE id = $2 `
 
@@ -128,7 +134,7 @@ func (s *studentRepo) UpdateStPassword(id string, password string) (string, erro
 	return password, nil
 }
 
-func (s *studentRepo) GetById(id string) (models.GetStudent, error) {
+func (s *studentRepo) GetById(ctx context.Context,id string) (models.GetStudent, error) {
 	resp := models.GetStudent{}
 
 	query := `SELECT id,
@@ -140,7 +146,7 @@ func (s *studentRepo) GetById(id string) (models.GetStudent, error) {
 			  mail 
 			  FROM students WHERE id=$1`
 
-	row := s.db.QueryRow(context.Background(), query, id)
+	row := s.db.QueryRow(ctx, query, id)
 
 	err := row.Scan(&resp.Id, &resp.FirstName, &resp.LastName, &resp.Age, &resp.ExternalId, &resp.Phone, &resp.Mail)
 
@@ -159,7 +165,7 @@ func (s *studentRepo) GetById(id string) (models.GetStudent, error) {
 							   INNER JOIN subjects sub ON sub.id=tt.subject_id
 							   WHERE tt.student_id=$1`
 
-	rows, err := s.db.Query(context.Background(), querySubTimeTab, resp.Id)
+	rows, err := s.db.Query(ctx, querySubTimeTab, resp.Id)
 	if err != nil {
 		return resp, err
 	}
@@ -183,11 +189,11 @@ func (s *studentRepo) GetById(id string) (models.GetStudent, error) {
 	return resp,nil
 }
 
-func (s *studentRepo) DeleteSt(id string) error {
+func (s *studentRepo) DeleteSt(ctx context.Context,id string) error {
 
 	query := `DELETE FROM students WHERE id = $1 `
 
-	_, err := s.db.Exec(context.Background(), query, id)
+	_, err := s.db.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -195,13 +201,13 @@ func (s *studentRepo) DeleteSt(id string) error {
 	return nil
 }
 
-func (s *studentRepo) StatusSt(id string) (models.IsActiveResponse, error) {
+func (s *studentRepo) StatusSt(ctx context.Context,id string) (models.IsActiveResponse, error) {
 
 	req := models.IsActiveResponse{}
 
 	query := `SELECT active FROM students where id=$1`
 
-	row := s.db.QueryRow(context.Background(), query, id)
+	row := s.db.QueryRow(ctx, query, id)
 
 	err := row.Scan(&req.Active)
 	if err != nil {

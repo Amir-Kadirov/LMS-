@@ -20,12 +20,12 @@ func NewSubject(db *pgxpool.Pool) subjectRepo {
 	}
 }
 
-func (t subjectRepo) CreateSubject(subject models.Subjects) (string, error) {
+func (t subjectRepo) CreateSubject(ctx context.Context,subject models.Subjects) (string, error) {
 	id := uuid.New()
 
 	query := `INSERT INTO subjects(id,name,type,created_at) VALUES($1,$2,$3,NOW())`
 
-	_, err := t.db.Exec(context.Background(), query, id, subject.Name, subject.Type)
+	_, err := t.db.Exec(ctx, query, id, subject.Name, subject.Type)
 
 	if err != nil {
 		return "", err
@@ -34,10 +34,10 @@ func (t subjectRepo) CreateSubject(subject models.Subjects) (string, error) {
 	return id.String(), nil
 }
 
-func (t subjectRepo) UpadateSubject(subject models.Subjects) (string, error) {
+func (t subjectRepo) UpadateSubject(ctx context.Context,subject models.Subjects) (string, error) {
 	query := `UPDATE subjects SET name=$1,type=$2,updated_at=NOW() where id=$3`
 
-	_, err := t.db.Exec(context.Background(), query, subject.Name, subject.Type, subject.Id)
+	_, err := t.db.Exec(ctx, query, subject.Name, subject.Type, subject.Id)
 	if err != nil {
 		return "", err
 	}
@@ -45,11 +45,11 @@ func (t subjectRepo) UpadateSubject(subject models.Subjects) (string, error) {
 	return subject.Id, nil
 }
 
-func (t subjectRepo) GetbyIdSubject(id string) (models.Subjects, error) {
+func (t subjectRepo) GetbyIdSubject(ctx context.Context,id string) (models.Subjects, error) {
 	subjects := models.Subjects{}
 	query := `SELECT id,name,type,to_char(created_at,'YYYY-MM-DD HH:MM:SS'),to_char(updated_at,'YYYY-MM-DD HH:MM:SS') FROM subjects where id=$1 `
 
-	row := t.db.QueryRow(context.Background(), query, id)
+	row := t.db.QueryRow(ctx, query, id)
 
 	var (
 		created_at sql.NullString
@@ -67,16 +67,16 @@ func (t subjectRepo) GetbyIdSubject(id string) (models.Subjects, error) {
 	return subjects, nil
 }
 
-func (t subjectRepo) DeleteSubject(id string) error {
+func (t subjectRepo) DeleteSubject(ctx context.Context,id string) error {
 	query := `DELETE FROM subjects WHERE id=$1`
-	_, err := t.db.Exec(context.Background(), query, id)
+	_, err := t.db.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (t subjectRepo) GetAllSubject(req models.GetAllStudentsRequest) (models.SubjectGetAll, error) {
+func (t subjectRepo) GetAllSubject(ctx context.Context,req models.GetAllStudentsRequest) (models.SubjectGetAll, error) {
 	resp := models.SubjectGetAll{}
 	filter := ""
 	offest := (req.Page - 1) * req.Limit
@@ -92,7 +92,7 @@ func (t subjectRepo) GetAllSubject(req models.GetAllStudentsRequest) (models.Sub
 				WHERE TRUE ` + filter + `
 				OFFSET $1 LIMIT $2
 					`
-	rows, err := t.db.Query(context.Background(), query, offest, req.Limit)
+	rows, err := t.db.Query(ctx, query, offest, req.Limit)
 
 	if err != nil {
 		return resp, err
@@ -114,7 +114,7 @@ func (t subjectRepo) GetAllSubject(req models.GetAllStudentsRequest) (models.Sub
 		resp.Subject=append(resp.Subject,Subject)
 	}
 
-	err = t.db.QueryRow(context.Background(), `SELECT count(*) from Subject WHERE TRUE `+filter+``).Scan(&resp.Count)
+	err = t.db.QueryRow(ctx, `SELECT count(*) from Subject WHERE TRUE `+filter+``).Scan(&resp.Count)
 	if err != nil {
 		return resp, err
 	}

@@ -3,6 +3,7 @@ package service
 import (
 	"backend_course/lms/api/models"
 	"backend_course/lms/storage"
+	"context"
 	"fmt"
 )
 
@@ -14,9 +15,9 @@ func NewStudentService(storage storage.IStorage) studentService {
 	return studentService{storage: storage}
 }
 
-func (s studentService) Create(student models.Student) (string, error) {
+func (s studentService) Create(ctx context.Context,student models.Student) (string, error) {
 	// business logic
-	id, err := s.storage.StudentStorage().Create(student)
+	id, err := s.storage.StudentStorage().Create(ctx,student)
 	if err != nil {
 		fmt.Println("error while creating student, err: ", err)
 		return "", err
@@ -25,10 +26,10 @@ func (s studentService) Create(student models.Student) (string, error) {
 	return id, nil
 }
 
-func (s studentService) GetAllStudent(req models.GetAllStudentsRequest) (models.GetAllStudentsResponse,error) {
+func (s studentService) GetAllStudent(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllStudentsResponse,error) {
 	students:=models.GetAllStudentsResponse{}
 
-	students,err:=s.storage.StudentStorage().GetAll(req)
+	students,err:=s.storage.StudentStorage().GetAll(ctx,req)
 	if err!=nil {
 		fmt.Println("error while get all students err: ",err)
 		return students,err
@@ -37,8 +38,8 @@ func (s studentService) GetAllStudent(req models.GetAllStudentsRequest) (models.
 	return students,nil
 }
 
-func (s studentService) UpdateStudent(student models.Student) (string,error) {
-	id,err:=s.storage.StudentStorage().UpdateSt(student)
+func (s studentService) UpdateStudent(ctx context.Context,student models.Student) (string,error) {
+	id,err:=s.storage.StudentStorage().UpdateSt(ctx,student)
 	if err!=nil {
 		return "",err
 	}
@@ -46,9 +47,9 @@ func (s studentService) UpdateStudent(student models.Student) (string,error) {
 	return id,nil
 }
 
-func (s studentService) GetByIdStudent(id string) (models.GetStudent,error) {
+func (s studentService) GetByIdStudent(ctx context.Context,id string) (models.GetStudent,error) {
 	student:=models.GetStudent{}
-	student,err:=s.storage.StudentStorage().GetById(id)
+	student,err:=s.storage.StudentStorage().GetById(ctx,id)
 	if err!=nil {
 		fmt.Println("error while get by id student err: ",err)
 		return student,err
@@ -57,8 +58,8 @@ func (s studentService) GetByIdStudent(id string) (models.GetStudent,error) {
 	return student,err
 }
 
-func (s studentService) DeleteStudent(id string) error {
-	err:=s.storage.StudentStorage().DeleteSt(id)
+func (s studentService) DeleteStudent(ctx context.Context,id string) error {
+	err:=s.storage.StudentStorage().DeleteSt(ctx,id)
 	if err!=nil {
 		fmt.Println("error while deleting student",err)
 		return err
@@ -67,8 +68,8 @@ func (s studentService) DeleteStudent(id string) error {
 	return nil
 }
 
-func (s studentService) UpdatePassword(id string,password string) (string,error) {
-	password,err:=s.storage.StudentStorage().UpdateStPassword(id,password)
+func (s studentService) UpdatePassword(ctx context.Context,id string,password string) (string,error) {
+	password,err:=s.storage.StudentStorage().UpdateStPassword(ctx,id,password)
 	if err!=nil {
 		fmt.Println("error while updating password ",err)
 		return "",err

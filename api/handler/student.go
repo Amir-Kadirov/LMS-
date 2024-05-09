@@ -40,7 +40,7 @@ func (h Handler) CreateStudent(c *gin.Context) {
 		return
 	}
 
-	id, err := h.Service.Student().Create(student)
+	id, err := h.Service.Student().Create(c.Request.Context(),student)
 	if err != nil {
 		handleResponse(c, "error while creating student", http.StatusBadRequest, err.Error())
 		return
@@ -74,7 +74,7 @@ func (h Handler) UpdateStudent(c *gin.Context) {
 
 	student.Id = id
 
-	id, err := h.Service.Student().UpdateStudent(student)
+	id, err := h.Service.Student().UpdateStudent(c.Request.Context(),student)
 	if err != nil {
 		handleResponse(c, "error while updating student", http.StatusInternalServerError, err.Error())
 		return
@@ -106,7 +106,7 @@ func (h Handler) GetAllStudents(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.Service.Student().GetAllStudent(models.GetAllStudentsRequest{
+	resp, err := h.Service.Student().GetAllStudent(c.Request.Context(),models.GetAllStudentsRequest{
 		Search: search,
 		Page:   page,
 		Limit:  limit,
@@ -137,7 +137,7 @@ func (h Handler) UpdateStudentPassword(c *gin.Context) {
 		return
 	}
 
-	id, err := h.Service.Student().UpdatePassword(id,password)
+	id, err := h.Service.Student().UpdatePassword(c.Request.Context(),id,password)
 	if err != nil {
 		handleResponse(c, "Error while updating student password", http.StatusInternalServerError, err.Error())
 		return
@@ -151,7 +151,7 @@ func (h Handler) UpdateStudentPassword(c *gin.Context) {
 // @Description	This API get by id a student
 // @Tags		student
 // @Produce		json
-// @Param		id path string true "Student ExternalId"
+// @Param		id path string true "Student Id"
 // @Success		200 {object} models.Response
 // @Failure		400 {object} models.Response
 // @Failure		404 {object} models.Response
@@ -159,7 +159,7 @@ func (h Handler) UpdateStudentPassword(c *gin.Context) {
 func (h Handler) GetById(c *gin.Context) {
 	id := c.Param("id")
 
-	data, err := h.Service.Student().GetByIdStudent(id)
+	data, err := h.Service.Student().GetByIdStudent(c.Request.Context(),id)
 	if err != nil {
 		handleResponse(c, fmt.Sprintf("error while get by id student %s", id), http.StatusInternalServerError, err.Error())
 		return
@@ -180,9 +180,9 @@ func (h Handler) GetById(c *gin.Context) {
 // @Failure		500 {object} models.Response
 func (h Handler) DeleteStudent(c *gin.Context) {
 
-	ExternalId:= c.Param("id")
+	Id:= c.Param("id")
 
-	err := h.Service.Student().DeleteStudent(ExternalId)
+	err := h.Service.Student().DeleteStudent(c.Request.Context(),Id)
 	if err != nil {
 		handleResponse(c, "error while deleting  student", http.StatusInternalServerError, err.Error())
 		return
@@ -209,7 +209,7 @@ func (h Handler) StudentStatus(c *gin.Context) {
 		return
 	}
 
-	boolean, err := h.Store.StudentStorage().StatusSt(id)
+	boolean, err := h.Store.StudentStorage().StatusSt(c.Request.Context(),id)
 	if err != nil {
 		handleResponse(c, "Error while checking student status", http.StatusInternalServerError, err.Error())
 		return

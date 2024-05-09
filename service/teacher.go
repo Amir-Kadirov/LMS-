@@ -3,6 +3,7 @@ package service
 import (
 	"backend_course/lms/api/models"
 	"backend_course/lms/storage"
+	"context"
 	"fmt"
 )
 
@@ -14,9 +15,9 @@ func NewTeacherService(storage storage.IStorage) teacherService {
 	return teacherService{storage: storage}
 }
 
-func (t teacherService) CreateTeacher(teacher models.Teacher) (string, error) {
+func (t teacherService) CreateTeacher(ctx context.Context,teacher models.Teacher) (string, error) {
 
-	id, err := t.storage.TeacherStorage().CreateTeacher(teacher)
+	id, err := t.storage.TeacherStorage().CreateTeacher(ctx,teacher)
 	if err != nil {
 		fmt.Println("error while creating teacher, err: ", err)
 		return "", err
@@ -25,8 +26,8 @@ func (t teacherService) CreateTeacher(teacher models.Teacher) (string, error) {
 	return id, nil
 }
 
-func (t teacherService) UpdateTeacher(teacher models.Teacher) error {
-	_,err := t.storage.TeacherStorage().UpdateTeacher(teacher)
+func (t teacherService) UpdateTeacher(ctx context.Context,teacher models.Teacher) error {
+	_,err := t.storage.TeacherStorage().UpdateTeacher(ctx,teacher)
 	if err != nil {
 		fmt.Println("error while updating teacher:", err)
 		return err
@@ -34,9 +35,9 @@ func (t teacherService) UpdateTeacher(teacher models.Teacher) error {
 	return nil
 }
 
-func (t teacherService) GetAllTeacher(req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error) {
+func (t teacherService) GetAllTeacher(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error) {
 
-	teachers,err:=t.storage.TeacherStorage().GetAllTeacher(req)
+	teachers,err:=t.storage.TeacherStorage().GetAllTeacher(ctx,req)
 	if err!=nil {
 		fmt.Println("error while get all teacher:",err)
 		return teachers,err
@@ -45,8 +46,8 @@ func (t teacherService) GetAllTeacher(req models.GetAllStudentsRequest) (models.
 	return teachers,nil
 }
 
-func (t teacherService) GetTeacherbyId(id string) (models.GetByIdTeacher, error) {
-	teacher,err:=t.storage.TeacherStorage().GetTeacherbyId(id)
+func (t teacherService) GetTeacherbyId(ctx context.Context,id string) (models.GetByIdTeacher, error) {
+	teacher,err:=t.storage.TeacherStorage().GetTeacherbyId(ctx,id)
 	if err!=nil {
 		fmt.Println("error while get by id teacher:",err)
 		return teacher,err
@@ -55,8 +56,8 @@ func (t teacherService) GetTeacherbyId(id string) (models.GetByIdTeacher, error)
 	return teacher,nil
 }
 
-func (t teacherService) DeleteTeacher(id string) error {
-	err:=t.storage.TeacherStorage().DeleteTeacher(id)
+func (t teacherService) DeleteTeacher(ctx context.Context,id string) error {
+	err:=t.storage.TeacherStorage().DeleteTeacher(ctx,id)
 	if err!=nil {
 		fmt.Println("error while deleting teacher:",err)
 		return err

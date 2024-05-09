@@ -3,6 +3,7 @@ package service
 import (
 	"backend_course/lms/api/models"
 	"backend_course/lms/storage"
+	"context"
 	"fmt"
 )
 
@@ -14,9 +15,9 @@ func NewSubjectService(storage storage.IStorage) subjectService {
 	return subjectService{storage: storage}
 }
 
-func (t subjectService) CreateSubject(subjects models.Subjects) (string, error) {
+func (t subjectService) CreateSubject(ctx context.Context,subjects models.Subjects) (string, error) {
 
-	id, err := t.storage.SubjectStorage().CreateSubject(subjects)
+	id, err := t.storage.SubjectStorage().CreateSubject(ctx,subjects)
 	if err != nil {
 		fmt.Println("error while creating teacher, err: ", err)
 		return "", err
@@ -25,8 +26,8 @@ func (t subjectService) CreateSubject(subjects models.Subjects) (string, error) 
 	return id, nil
 }
 
-func (t subjectService) UpdateSubject(subject models.Subjects) error {
-	_,err:=t.storage.SubjectStorage().UpadateSubject(subject)	
+func (t subjectService) UpdateSubject(ctx context.Context,subject models.Subjects) error {
+	_,err:=t.storage.SubjectStorage().UpadateSubject(ctx,subject)	
 	if err!=nil {
 		return err
 	}
@@ -34,8 +35,8 @@ func (t subjectService) UpdateSubject(subject models.Subjects) error {
 }
 
 
-func (t subjectService) GetbyIdSubject(id string) (models.Subjects,error) {
-	resp,err:=t.storage.SubjectStorage().GetbyIdSubject(id)
+func (t subjectService) GetbyIdSubject(ctx context.Context,id string) (models.Subjects,error) {
+	resp,err:=t.storage.SubjectStorage().GetbyIdSubject(ctx,id)
 	if err!=nil {
 		return resp,err
 	}
@@ -43,8 +44,8 @@ func (t subjectService) GetbyIdSubject(id string) (models.Subjects,error) {
 	return resp,nil
 }
 
-func (t subjectService) DeleteSubject(id string) error {
-	err:=t.storage.SubjectStorage().DeleteSubject(id)
+func (t subjectService) DeleteSubject(ctx context.Context,id string) error {
+	err:=t.storage.SubjectStorage().DeleteSubject(ctx,id)
 	if err!=nil {
 		fmt.Println("error while deleting subject:",err)
 		return err
@@ -53,9 +54,9 @@ func (t subjectService) DeleteSubject(id string) error {
 	return nil
 }
 
-func (t subjectService) GetAllSubject(req models.GetAllStudentsRequest) (models.SubjectGetAll, error) {
+func (t subjectService) GetAllSubject(ctx context.Context,req models.GetAllStudentsRequest) (models.SubjectGetAll, error) {
 
-	subject,err:=t.storage.SubjectStorage().GetAllSubject(req)
+	subject,err:=t.storage.SubjectStorage().GetAllSubject(ctx,req)
 	if err!=nil {
 		fmt.Println("error while get all subject:",err)
 		return subject,err

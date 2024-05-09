@@ -27,7 +27,7 @@ func (h Handler) CreateTimeTable(c *gin.Context) {
 		return
 	}
 
-	id, err := h.Service.TimeTable().CreateTimeTable(timetable)
+	id, err := h.Service.TimeTable().CreateTimeTable(c.Request.Context(),timetable)
 	if err != nil {
 		handleResponse(c, "error while creating timetable", http.StatusBadRequest, err.Error())
 		return
@@ -50,7 +50,7 @@ func (h Handler) DeleteTimeTable(c *gin.Context) {
 
 	Id:= c.Param("id")
 
-	err := h.Service.TimeTable().DeleteTimeTable(Id)
+	err := h.Service.TimeTable().DeleteTimeTable(c.Request.Context(),Id)
 	if err != nil {
 		handleResponse(c, "error while deleting timetable", http.StatusInternalServerError, err.Error())
 		return

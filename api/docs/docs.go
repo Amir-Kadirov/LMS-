@@ -323,7 +323,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Student ExternalId",
+                        "description": "Student Id",
                         "name": "id",
                         "in": "path",
                         "required": true

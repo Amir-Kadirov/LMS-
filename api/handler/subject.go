@@ -28,7 +28,7 @@ func (h Handler) CreateSubject(c *gin.Context) {
 		return
 	}
 
-	id, err := h.Service.Subject().CreateSubject(subject)
+	id, err := h.Service.Subject().CreateSubject(c.Request.Context(),subject)
 	if err != nil {
 		handleResponse(c, "error while creating subject", http.StatusBadRequest, err.Error())
 		return
@@ -50,7 +50,7 @@ func (h Handler) CreateSubject(c *gin.Context) {
 func (h Handler) GetbyIdSubject(c *gin.Context) {
 	id := c.Param("id")
 
-	data, err := h.Service.Subject().GetbyIdSubject(id)
+	data, err := h.Service.Subject().GetbyIdSubject(c.Request.Context(),id)
 	if err != nil {
 		handleResponse(c, fmt.Sprintf("error while get by id subject %s", id), http.StatusInternalServerError, err.Error())
 		return
@@ -84,7 +84,7 @@ func (h Handler) UpdateSubject(c *gin.Context) {
 
 	subject.Id = id
 
-	err := h.Service.Subject().UpdateSubject(subject)
+	err := h.Service.Subject().UpdateSubject(c.Request.Context(),subject)
 	if err != nil {
 		handleResponse(c, fmt.Sprintf("error while updating subject %s", subject.Id), http.StatusInternalServerError, err.Error())
 		return
@@ -107,7 +107,7 @@ func (h Handler) DeleteSubject(c *gin.Context) {
 
 	Id := c.Param("id")
 
-	err := h.Service.Subject().DeleteSubject(Id)
+	err := h.Service.Subject().DeleteSubject(c.Request.Context(),Id)
 	if err != nil {
 		handleResponse(c, "error while deleting  Subject", http.StatusInternalServerError, err.Error())
 		return
@@ -139,7 +139,7 @@ func (h Handler) GetAllSubject(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.Service.Subject().GetAllSubject(models.GetAllStudentsRequest{
+	resp, err := h.Service.Subject().GetAllSubject(c.Request.Context(),models.GetAllStudentsRequest{
 		Search: search,
 		Page:   page,
 		Limit:  limit,

@@ -6,4 +6,8 @@ const (
 	ERR_REDIRECTION     = "You have been redirected and the completion of the request requires further action"
 	ERR_BADREQUEST      = "Bad request"
 	ERR_INTERNAL_SERVER = "While the request appears to be valid, the server could not complete the request"
+	SmtpServer          = "smtp.gmail.com"
+	SmtpPort            = "587"
+	SmtpUsername        = "amirjonqodirov28@gmail.com"
+	SmtpPassword        = "bgwc hetf jyxo otkk"
 )

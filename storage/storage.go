@@ -1,6 +1,9 @@
 package storage
 
-import "backend_course/lms/api/models"
+import (
+	"backend_course/lms/api/models"
+	"context"
+)
 
 type IStorage interface {
 	CloseDB()
@@ -11,32 +14,32 @@ type IStorage interface {
 }
 
 type StudentStorage interface {
-	Create(student models.Student) (string, error)
-	GetAll(req models.GetAllStudentsRequest) (models.GetAllStudentsResponse, error)
-	UpdateSt(student models.Student) (string, error)
-	UpdateStPassword(id string, password string) (string, error)
-	GetById(ExternalId string) (models.GetStudent, error)
-	DeleteSt(external_id string) error
-	StatusSt(id string) (models.IsActiveResponse, error)
+	Create(ctx context.Context,student models.Student) (string, error)
+	GetAll(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllStudentsResponse, error)
+	UpdateSt(ctx context.Context,student models.Student) (string, error)
+	UpdateStPassword(ctx context.Context,id string, password string) (string, error)
+	GetById(ctx context.Context,ExternalId string) (models.GetStudent, error)
+	DeleteSt(ctx context.Context,external_id string) error
+	StatusSt(ctx context.Context,id string) (models.IsActiveResponse, error)
 }
 
 type TeacherStorage interface {
-	CreateTeacher(teacher models.Teacher) (string, error)
-	UpdateTeacher(teacher models.Teacher) (string,error)
-	GetAllTeacher(req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error)
-	GetTeacherbyId(id string) (models.GetByIdTeacher, error)
-	DeleteTeacher(id string) error
+	CreateTeacher(ctx context.Context,teacher models.Teacher) (string, error)
+	UpdateTeacher(ctx context.Context,teacher models.Teacher) (string,error)
+	GetAllTeacher(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error)
+	GetTeacherbyId(ctx context.Context,id string) (models.GetByIdTeacher, error)
+	DeleteTeacher(ctx context.Context,id string) error
 }
 
 type SubjectStorage interface {
-	CreateSubject(subject models.Subjects) (string, error)
-	UpadateSubject(subject models.Subjects) (string,error)
-	GetbyIdSubject(id string) (models.Subjects, error)
-	DeleteSubject(id string) error
-	GetAllSubject(req models.GetAllStudentsRequest) (models.SubjectGetAll, error)
+	CreateSubject(ctx context.Context,subject models.Subjects) (string, error)
+	UpadateSubject(ctx context.Context,subject models.Subjects) (string,error)
+	GetbyIdSubject(ctx context.Context,id string) (models.Subjects, error)
+	DeleteSubject(ctx context.Context,id string) error
+	GetAllSubject(ctx context.Context,req models.GetAllStudentsRequest) (models.SubjectGetAll, error)
 }
 
 type TimeTableStorage interface {
-	DeleteTimeTable(id string) error
-	CreateTimeTable(timeTable models.TimeTable) (string, error)
+	DeleteTimeTable(ctx context.Context,id string) error
+	CreateTimeTable(ctx context.Context,timeTable models.TimeTable) (string, error)
 }

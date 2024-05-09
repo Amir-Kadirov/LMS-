@@ -141,7 +141,7 @@ paths:
     get:
       description: This API get by id a student
       parameters:
-      - description: Student ExternalId
+      - description: Student Id
         in: path
         name: id
         required: true

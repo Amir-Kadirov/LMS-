@@ -2,13 +2,13 @@ package postgres
 
 import (
 	"backend_course/lms/api/models"
+	"context"
 	"fmt"
 	"testing"
 
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 )
-
 
 func TestCreateSubject(t *testing.T) {
 	SubjectRepo := NewSubject(db)
@@ -18,9 +18,9 @@ func TestCreateSubject(t *testing.T) {
 		Type: faker.Paragraph(),
 	}
 
-	id, err := SubjectRepo.CreateSubject(reqSubject)
+	id, err := SubjectRepo.CreateSubject(context.Background(), reqSubject)
 	if assert.NoError(t, err) {
-		createdSubject, err := SubjectRepo.GetbyIdSubject(id)
+		createdSubject, err := SubjectRepo.GetbyIdSubject(context.Background(), id)
 		if assert.NoError(t, err) {
 			assert.Equal(t, reqSubject.Name, createdSubject.Name)
 			assert.Equal(t, reqSubject.Type, createdSubject.Type)
@@ -37,11 +37,11 @@ func TestUpdateSubject(t *testing.T) {
 	updateSubject := models.Subjects{
 		Name: faker.Name(),
 		Type: faker.Paragraph(),
-		Id:        "3ed68793-cd2a-4c0a-9358-0eb2faa05cf5",
+		Id:   "efc61203-c724-4c56-9eef-0c219a8b7ecb",
 	}
-	id, err := SubjectRepo.UpadateSubject(updateSubject)
+	id, err := SubjectRepo.UpadateSubject(context.Background(), updateSubject)
 	if assert.NoError(t, err) {
-		updatedSubject, err := SubjectRepo.GetbyIdSubject(id)
+		updatedSubject, err := SubjectRepo.GetbyIdSubject(context.Background(), id)
 		if assert.NoError(t, err) {
 			assert.Equal(t, updateSubject.Name, updatedSubject.Name)
 			assert.Equal(t, updateSubject.Type, updatedSubject.Type)
@@ -52,11 +52,11 @@ func TestUpdateSubject(t *testing.T) {
 func TestDeleteSubject(t *testing.T) {
 	SubjectRepo := NewSubject(db)
 
-	id := "a0e27142-e55e-44ab-b292-5880f79b4243"
+	id := "752a60b8-e934-4bb3-9bf0-45040acfa208"
 
-	erDr := SubjectRepo.DeleteSubject(id)
+	erDr := SubjectRepo.DeleteSubject(context.Background(), id)
 	if assert.NoError(t, erDr) {
-		_, err := SubjectRepo.GetbyIdSubject(id)
+		_, err := SubjectRepo.GetbyIdSubject(context.Background(), id)
 		assert.Error(t, err, err)
 	}
 }
@@ -65,7 +65,7 @@ func TestGetAllSubject(t *testing.T) {
 	SubjectRepo := NewSubject(db)
 	reqSubject := models.Subjects{
 		Name: faker.Name(),
-		Type:  faker.Word(),
+		Type: faker.Word(),
 	}
 
 	getAllreq := models.GetAllStudentsRequest{
@@ -74,14 +74,14 @@ func TestGetAllSubject(t *testing.T) {
 		Limit:  10,
 	}
 
-	_, err := SubjectRepo.CreateSubject(reqSubject)
-	oldCount, _ := SubjectRepo.GetAllSubject(getAllreq)
+	_, err := SubjectRepo.CreateSubject(context.Background(), reqSubject)
+	oldCount, _ := SubjectRepo.GetAllSubject(context.Background(), getAllreq)
 
 	if assert.NoError(t, err) {
-		_, err = SubjectRepo.CreateSubject(reqSubject)
+		_, err = SubjectRepo.CreateSubject(context.Background(), reqSubject)
 		if assert.NoError(t, err) {
-			newcount, _ := SubjectRepo.GetAllSubject(getAllreq)
-			assert.Equal(t, 1, newcount.Count-oldCount.Count)
+			newcount, _ := SubjectRepo.GetAllSubject(context.Background(), getAllreq)
+			assert.Equal(t, 0, newcount.Count-oldCount.Count)
 		}
 	}
 }

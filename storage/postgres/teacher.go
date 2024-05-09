@@ -20,13 +20,13 @@ func NewTeacher(db *pgxpool.Pool) teacherRepo {
 	}
 }
 
-func (t teacherRepo) CreateTeacher(teacher models.Teacher) (string, error) {
+func (t teacherRepo) CreateTeacher(ctx context.Context,teacher models.Teacher) (string, error) {
 	id := uuid.New()
 	subjectId := uuid.New()
 	query := `INSERT INTO teacher(id,first_name,last_name,subject_id,start_work,phone,mail,created_at)
 	 VALUES($1,$2,$3,$4,$5,$6,$7,NOW())`
 
-	_, err := t.db.Exec(context.Background(), query, id, teacher.FirstName, teacher.LastName,
+	_, err := t.db.Exec(ctx, query, id, teacher.FirstName, teacher.LastName,
 		subjectId, teacher.StartWork, teacher.Phone, teacher.Mail)
 
 	if err != nil {
@@ -36,10 +36,10 @@ func (t teacherRepo) CreateTeacher(teacher models.Teacher) (string, error) {
 	return id.String(), nil
 }
 
-func (t teacherRepo) UpdateTeacher(teacher models.Teacher) (string,error) {
+func (t teacherRepo) UpdateTeacher(ctx context.Context,teacher models.Teacher) (string,error) {
 	query := `UPDATE teacher SET first_name=$1,last_name=$2,start_work=$3,phone=$4,mail=$5,updated=NOW() WHERE id=$6`
 
-	_, err := t.db.Exec(context.Background(), query, teacher.FirstName, teacher.LastName,
+	_, err := t.db.Exec(ctx, query, teacher.FirstName, teacher.LastName,
 		teacher.StartWork, teacher.Phone, teacher.Mail, teacher.Id)
 	if err != nil {
 		return "",err
@@ -49,7 +49,7 @@ func (t teacherRepo) UpdateTeacher(teacher models.Teacher) (string,error) {
 	return teacher.Id,nil
 }
 
-func (t teacherRepo) GetAllTeacher(req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error) {
+func (t teacherRepo) GetAllTeacher(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error) {
 	resp := models.GetAllTeacherResponse{}
 	filter := ""
 	offest := (req.Page - 1) * req.Limit
@@ -69,7 +69,7 @@ func (t teacherRepo) GetAllTeacher(req models.GetAllStudentsRequest) (models.Get
 				WHERE TRUE ` + filter + `
 				OFFSET $1 LIMIT $2
 					`
-	rows, err := t.db.Query(context.Background(), query, offest, req.Limit)
+	rows, err := t.db.Query(ctx, query, offest, req.Limit)
 	if err != nil {
 		return resp, err
 	}
@@ -93,7 +93,7 @@ func (t teacherRepo) GetAllTeacher(req models.GetAllStudentsRequest) (models.Get
 		resp.Teachers = append(resp.Teachers, teacher)
 	}
 
-	err = t.db.QueryRow(context.Background(), `SELECT count(*) from teacher WHERE TRUE `+filter+``).Scan(&resp.Count)
+	err = t.db.QueryRow(ctx, `SELECT count(*) from teacher WHERE TRUE `+filter+``).Scan(&resp.Count)
 	if err != nil {
 		return resp, err
 	}
@@ -101,7 +101,7 @@ func (t teacherRepo) GetAllTeacher(req models.GetAllStudentsRequest) (models.Get
 	return resp, nil
 }
 
-func (t teacherRepo) GetTeacherbyId(id string) (models.GetByIdTeacher, error) {
+func (t teacherRepo) GetTeacherbyId(ctx context.Context,id string) (models.GetByIdTeacher, error) {
 	resp := models.GetByIdTeacher{}
 	query := `SELECT id,
 	first_name,
@@ -112,7 +112,7 @@ func (t teacherRepo) GetTeacherbyId(id string) (models.GetByIdTeacher, error) {
 	mail
        FROM teacher WHERE id=$1`
 
-	row := t.db.QueryRow(context.Background(), query, id)
+	row := t.db.QueryRow(ctx, query, id)
 	err := row.Scan(&resp.Id, &resp.FirstName, &resp.LastName, &resp.SubjectId, &resp.StartWork, &resp.Phone, &resp.Mail)
 	if err != nil {
 		return resp, err
@@ -129,7 +129,7 @@ func (t teacherRepo) GetTeacherbyId(id string) (models.GetByIdTeacher, error) {
 							   INNER JOIN subjects sub ON sub.id=tt.subject_id
 							   WHERE tt.teacher_id=$1`
 
-	rows, err := t.db.Query(context.Background(), querySubTimeTab, resp.Id)
+	rows, err := t.db.Query(ctx, querySubTimeTab, resp.Id)
 	if err != nil {
 		return resp, err
 	}
@@ -154,10 +154,10 @@ func (t teacherRepo) GetTeacherbyId(id string) (models.GetByIdTeacher, error) {
 	return resp,nil
 }
 
-func (t teacherRepo) DeleteTeacher(id string) error {
+func (t teacherRepo) DeleteTeacher(ctx context.Context,id string) error {
 	query := `DELETE FROM teacher WHERE id=$1`
 
-	_, err := t.db.Exec(context.Background(), query, id)
+	_, err := t.db.Exec(ctx, query, id)
 	if err != nil {
 		return err
 	}
