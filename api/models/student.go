@@ -38,7 +38,7 @@ type GetStudent struct {
 	ExternalId string             `json:"external_id"`
 	Phone      string             `json:"phone"`
 	Mail       string             `json:"mail,omitempty"`
-	Teacher    []StudentTeacher     `json:"teacher"`
+	Teacher    []StudentTeacher   `json:"teacher"`
 	TimeTable  []StudentTimeTable `json:"time_table"`
 	Subjects   []StudentSubjects  `json:"subjects"`
 }
@@ -51,9 +51,16 @@ type GetAllStudentsRequest struct {
 
 type GetAllStudentsResponse struct {
 	Students []GetStudent `json:"students"`
-	Count    int        `json:"count"`
+	Count    int          `json:"count"`
 }
 
 type IsActiveResponse struct {
 	Active bool `json:"active"`
+}
+
+type CheckLessonStudent struct {
+	TeacherName string `json:"teacher_name"`
+	StartDate   string `json:"start_date"`
+	EndDate     string `json:"end_date"`
+	SubjectName string `json:"subject_name"`
 }

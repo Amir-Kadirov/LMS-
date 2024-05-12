@@ -4,6 +4,7 @@ import (
 	"backend_course/lms/api"
 	"backend_course/lms/config"
 	"backend_course/lms/service"
+	"backend_course/lms/pkg/logger"
 	"backend_course/lms/storage/postgres"
 	"context"
 	"fmt"
@@ -20,7 +21,9 @@ func main() {
 
 	service:=service.New(store)
 
-	c := api.New(store,service)
+	log := logger.New(cfg.ServiceName)
+
+	c := api.New(service,log)
 
 	fmt.Println("programm is running on localhost:8008...")
 	c.Run(":8080")

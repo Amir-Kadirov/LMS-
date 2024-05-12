@@ -51,6 +51,8 @@ definitions:
         type: string
       mail:
         type: string
+      password:
+        type: string
       phone:
         type: string
       start_work:
@@ -101,9 +103,11 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get a student
       tags:
-      - student
+      - Student
     post:
       consumes:
       - application/json
@@ -134,9 +138,11 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Creates a student
       tags:
-      - student
+      - Student
   /student/{id}:
     get:
       description: This API get by id a student
@@ -165,9 +171,11 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get by id a student
       tags:
-      - student
+      - Student
   /student/deletstudent/{id}:
     delete:
       description: This API delete a student
@@ -196,9 +204,44 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a student
       tags:
-      - student
+      - Student
+  /student/lesson/{id}:
+    get:
+      description: This API endpoint checks the lesson of a student by their ID.
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status checked successfully
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Check the lesson of a student
+      tags:
+      - Student
   /student/status/{id}:
     get:
       description: This API endpoint checks the status of a student by their ID.
@@ -227,9 +270,11 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Check the status of a student
       tags:
-      - student
+      - Student
   /student/updatepassword/{id}/{password}:
     put:
       description: This API endpoint updates a student's password by their ID.
@@ -265,7 +310,7 @@ paths:
             $ref: '#/definitions/models.Response'
       summary: Update a student's password
       tags:
-      - student
+      - Student
   /student/updatestudent/{id}:
     put:
       consumes:
@@ -302,9 +347,11 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Update a student
       tags:
-      - student
+      - Student
   /subject:
     get:
       description: This API returns all Subject
@@ -327,6 +374,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get a Subject
       tags:
       - Subject
@@ -360,6 +409,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Creates a subject
       tags:
       - Subject
@@ -391,6 +442,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get by id a subject
       tags:
       - Subject
@@ -422,6 +475,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a Subject
       tags:
       - Subject
@@ -461,6 +516,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Update a subject
       tags:
       - Subject
@@ -486,6 +543,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get a teacher
       tags:
       - Teacher
@@ -519,6 +578,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Creates a teacher
       tags:
       - Teacher
@@ -550,6 +611,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get by id a teacher
       tags:
       - Teacher
@@ -581,7 +644,42 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a teacher
+      tags:
+      - Teacher
+  /teacher/lesson/{id}:
+    get:
+      description: This API endpoint checks the lesson of a teacher by their ID.
+      parameters:
+      - description: teacher ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status checked successfully
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Check the lesson of a teacher
       tags:
       - Teacher
   /teacher/updateteacher/{id}:
@@ -620,6 +718,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Update a teacher
       tags:
       - Teacher
@@ -654,6 +754,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Creates a timetable
       tags:
       - TimeTable
@@ -685,7 +787,14 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a timetable
       tags:
       - TimeTable
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -65,3 +65,12 @@ func (t teacherService) DeleteTeacher(ctx context.Context,id string) error {
 
 	return nil
 }
+
+func (t teacherService) LessonTeacher(ctx context.Context,id string) (models.CheckLessonTeacher,error) {
+	lesson,err:=t.storage.TeacherStorage().CheckLessonTeacher(ctx,id)
+	if err!=nil {
+		return lesson,err
+	}
+
+	return lesson,nil
+}

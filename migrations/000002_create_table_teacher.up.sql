@@ -10,5 +10,8 @@ CREATE TABLE IF NOT EXISTS teacher (
   updated timestamp
 );
 
-ALTER TABLE teacher
+ALTER TABLE IF EXISTS teacher
 ALTER COLUMN start_work TYPE varchar(50);
+
+ALTER TABLE IF EXISTS teacher
+ADD COLUMN password varchar;

@@ -8,6 +8,7 @@ type Teacher struct {
 	StartWork string `json:"start_work"`
 	Mail      string `json:"mail"`
 	Phone     string `json:"phone"`
+	Password string `json:"password"`
 }
 
 type GetAllTeacherResponse struct {
@@ -41,4 +42,12 @@ type GetByIdTeacher struct {
 type TeacherTimeTable struct {
 	StartDate string `json:"start_date"`
 	EndDate   string `json:"end_date"`
+}
+
+
+type CheckLessonTeacher struct {
+	StudentName string `json:"teacher_name"`
+	StartDate   string `json:"start_date"`
+	EndDate     string `json:"end_date"`
+	SubjectName string `json:"subject_name"`
 }

@@ -3,9 +3,11 @@ package postgres
 import (
 	"backend_course/lms/api/models"
 	"backend_course/lms/pkg"
+	"backend_course/lms/pkg/hash"
 	smtp "backend_course/lms/pkg/helper"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -24,29 +26,34 @@ func NewStudent(db *pgxpool.Pool) studentRepo {
 	}
 }
 
-func (s *studentRepo) Create(ctx context.Context,student models.Student) (string, error) {
+func (s *studentRepo) Create(ctx context.Context, student models.Student) (string, error) {
 
 	id := uuid.New()
 	student.ExternalId = strconv.Itoa(rand.Intn(999))
 
-	query := ` INSERT INTO students (id, first_name,last_name,age,external_id,
-		phone,mail,pasword,active, created_at) VALUES ($1, $2,$3,$4,$5,$6,$7,$8,$9, NOW()) `
-
-	_, err := s.db.Exec(ctx, query, id, student.FirstName, student.LastName, student.Age, student.ExternalId,
-		student.Phone, student.Mail, student.Pasword, student.Active)
+	hashedPassword, err := hash.HashPassword(student.Pasword)
 	if err != nil {
 		return "", err
 	}
 
-	err=smtp.SendMail(student.Mail,"Welcome new student")
-	if err!=nil {
-		return "",err
+	query := ` INSERT INTO students (id, first_name,last_name,age,external_id,
+		phone,mail,pasword,active, created_at) VALUES ($1, $2,$3,$4,$5,$6,$7,$8,$9, NOW()) `
+
+	_, err = s.db.Exec(ctx, query, id, student.FirstName, student.LastName, student.Age, student.ExternalId,
+		student.Phone, student.Mail, hashedPassword, student.Active)
+	if err != nil {
+		return "", err
+	}
+
+	err = smtp.SendMail(student.Mail, "Welcome new student")
+	if err != nil {
+		return "", err
 	}
 
 	return id.String(), nil
 }
 
-func (s *studentRepo) GetAll(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllStudentsResponse, error) {
+func (s *studentRepo) GetAll(ctx context.Context, req models.GetAllStudentsRequest) (models.GetAllStudentsResponse, error) {
 	resp := models.GetAllStudentsResponse{}
 	filter := ""
 	offest := (req.Page - 1) * req.Limit
@@ -98,15 +105,16 @@ func (s *studentRepo) GetAll(ctx context.Context,req models.GetAllStudentsReques
 	return resp, nil
 }
 
-func (s *studentRepo) UpdateSt(ctx context.Context,student models.Student) (string, error) {
+func (s *studentRepo) UpdateSt(ctx context.Context, student models.Student) (string, error) {
 
 	query := ` UPDATE students set first_name=$1,
 								   last_name=$2,
 								   age=$3,
 								   phone=$4,
 								   mail=$5,
+								   pasword=$6,
 								   updated = NOW()
-								       WHERE id = $6 `
+								       WHERE id = $7 `
 
 	_, err := s.db.Exec(ctx, query,
 		student.FirstName,
@@ -114,6 +122,7 @@ func (s *studentRepo) UpdateSt(ctx context.Context,student models.Student) (stri
 		student.Age,
 		student.Phone,
 		student.Mail,
+		student.Pasword,
 		student.Id)
 	if err != nil {
 		return "", err
@@ -122,19 +131,7 @@ func (s *studentRepo) UpdateSt(ctx context.Context,student models.Student) (stri
 	return student.Id, nil
 }
 
-func (s *studentRepo) UpdateStPassword(ctx context.Context,id string, password string) (string, error) {
-
-	query := ` UPDATE students set pasword = $1,updated = NOW() WHERE id = $2 `
-
-	_, err := s.db.Exec(context.Background(), query, password, id)
-	if err != nil {
-		return "", err
-	}
-
-	return password, nil
-}
-
-func (s *studentRepo) GetById(ctx context.Context,id string) (models.GetStudent, error) {
+func (s *studentRepo) GetById(ctx context.Context, id string) (models.GetStudent, error) {
 	resp := models.GetStudent{}
 
 	query := `SELECT id,
@@ -186,10 +183,10 @@ func (s *studentRepo) GetById(ctx context.Context,id string) (models.GetStudent,
 		resp.TimeTable = append(resp.TimeTable, timetable)
 		resp.Teacher = append(resp.Teacher, teacher)
 	}
-	return resp,nil
+	return resp, nil
 }
 
-func (s *studentRepo) DeleteSt(ctx context.Context,id string) error {
+func (s *studentRepo) DeleteSt(ctx context.Context, id string) error {
 
 	query := `DELETE FROM students WHERE id = $1 `
 
@@ -201,7 +198,7 @@ func (s *studentRepo) DeleteSt(ctx context.Context,id string) error {
 	return nil
 }
 
-func (s *studentRepo) StatusSt(ctx context.Context,id string) (models.IsActiveResponse, error) {
+func (s *studentRepo) StatusSt(ctx context.Context, id string) (models.IsActiveResponse, error) {
 
 	req := models.IsActiveResponse{}
 
@@ -215,4 +212,27 @@ func (s *studentRepo) StatusSt(ctx context.Context,id string) (models.IsActiveRe
 	}
 
 	return req, nil
+}
+
+
+func (s *studentRepo) CheckLessonStudent(ctx context.Context, id string) (models.CheckLessonStudent, error) {
+	query := `SELECT t.first_name,
+				   to_char(tt.start_date,'YYYY-MM-DD HH:MM:SS'),
+			       to_char(tt.end_date,'YYYY-MM-DD HH:MM:SS'),
+				   sub.name
+				   FROM time_tables tt INNER JOIN teacher t on t.id=tt.teacher_id
+				                       INNER JOIN subjects sub on sub.id=tt.subject_id
+									   WHERE tt.student_id=$1`
+
+	lessons:=models.CheckLessonStudent{}
+
+	row:=s.db.QueryRow(ctx,query,id)
+	err:=row.Scan(&lessons.TeacherName,&lessons.StartDate,&lessons.EndDate,&lessons.SubjectName)
+	if err==sql.ErrNoRows {
+		return lessons,errors.New("student didn't have lesson")
+	}else if err!=nil {
+		return lessons,err
+	}
+
+	return lessons,nil
 }

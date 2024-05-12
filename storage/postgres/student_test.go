@@ -105,16 +105,3 @@ func TestStatusStudent(t *testing.T) {
         }
     }
 }
-
-
-func TestUpdatePassword(t *testing.T) {
-	studentRepo := NewStudent(db)
-
-	id := "68afa24d-959c-44ce-add7-6e5974e04b37"
-	password:="New Password"
-
-	newpassword,erDr := studentRepo.UpdateStPassword(context.Background(),id,password)
-	if assert.NoError(t, erDr) {
-		assert.Equal(t,password,newpassword)
-	}
-}

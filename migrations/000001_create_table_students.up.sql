@@ -11,3 +11,7 @@ CREATE TABLE IF NOT EXISTS students (
   updated timestamp,
   active boolean
 );
+
+
+ALTER TABLE students
+ALTER COLUMN pasword TYPE varchar;

@@ -68,12 +68,21 @@ func (s studentService) DeleteStudent(ctx context.Context,id string) error {
 	return nil
 }
 
-func (s studentService) UpdatePassword(ctx context.Context,id string,password string) (string,error) {
-	password,err:=s.storage.StudentStorage().UpdateStPassword(ctx,id,password)
+func (s studentService) StatusStudent(ctx context.Context,id string) (models.IsActiveResponse,error) {
+	isactive,err:=s.storage.StudentStorage().StatusSt(ctx,id)
 	if err!=nil {
-		fmt.Println("error while updating password ",err)
-		return "",err
+		fmt.Println("error while checking status", err)
+		return isactive,err
+	}
+	
+	return isactive,nil
+}
+
+func (s studentService) LessonStudent(ctx context.Context,id string) (models.CheckLessonStudent,error) {
+	lesson,err:=s.storage.StudentStorage().CheckLessonStudent(ctx,id)
+	if err!=nil {
+		return lesson,err
 	}
 
-	return password,nil
+	return lesson,nil
 }

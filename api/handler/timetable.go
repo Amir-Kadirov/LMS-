@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Security ApiKeyAuth
 // @Router		/timetable [post]
 // @Summary		Creates a timetable
 // @Description	This api creates a timetable and returns its id
@@ -20,22 +21,23 @@ import (
 // @Failure		404  {object}  models.Response
 // @Failure		500  {object}  models.Response
 func (h Handler) CreateTimeTable(c *gin.Context) {
-	timetable:=models.TimeTable{}
+	timetable := models.TimeTable{}
 
 	if err := c.ShouldBindJSON(&timetable); err != nil {
-		handleResponse(c, "error while reading request body", http.StatusBadRequest, err.Error())
+		handleResponse(c, h.Log, "error while reading request body", http.StatusBadRequest, err.Error())
 		return
 	}
 
-	id, err := h.Service.TimeTable().CreateTimeTable(c.Request.Context(),timetable)
+	id, err := h.Service.TimeTable().CreateTimeTable(c.Request.Context(), timetable)
 	if err != nil {
-		handleResponse(c, "error while creating timetable", http.StatusBadRequest, err.Error())
+		handleResponse(c, h.Log, "error while creating timetable", http.StatusBadRequest, err.Error())
 		return
 	}
 
-	handleResponse(c, "Created successfully", http.StatusOK, id)
+	handleResponse(c, h.Log, "Created successfully", http.StatusOK, id)
 }
 
+// @Security ApiKeyAuth
 // @Router		/timetable/delettimetable/{id} [delete]
 // @Summary		Delete a timetable
 // @Description	This API delete a timetable
@@ -48,13 +50,13 @@ func (h Handler) CreateTimeTable(c *gin.Context) {
 // @Failure		500 {object} models.Response
 func (h Handler) DeleteTimeTable(c *gin.Context) {
 
-	Id:= c.Param("id")
+	Id := c.Param("id")
 
-	err := h.Service.TimeTable().DeleteTimeTable(c.Request.Context(),Id)
+	err := h.Service.TimeTable().DeleteTimeTable(c.Request.Context(), Id)
 	if err != nil {
-		handleResponse(c, "error while deleting timetable", http.StatusInternalServerError, err.Error())
+		handleResponse(c, h.Log, "error while deleting timetable", http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	handleResponse(c, "Time Table deleted successfully", http.StatusOK, err)
+	handleResponse(c, h.Log, "Time Table deleted successfully", http.StatusOK, err)
 }

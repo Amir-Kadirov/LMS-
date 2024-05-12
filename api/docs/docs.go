@@ -17,12 +17,17 @@ const docTemplate = `{
     "paths": {
         "/student": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API returns all students",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "student"
+                    "Student"
                 ],
                 "summary": "Get a student",
                 "responses": {
@@ -53,6 +58,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This api creates a student and returns its id",
                 "consumes": [
                     "application/json"
@@ -61,7 +71,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "student"
+                    "Student"
                 ],
                 "summary": "Creates a student",
                 "parameters": [
@@ -105,12 +115,17 @@ const docTemplate = `{
         },
         "/student/deletstudent/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API delete a student",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "student"
+                    "Student"
                 ],
                 "summary": "Delete a student",
                 "parameters": [
@@ -150,14 +165,71 @@ const docTemplate = `{
                 }
             }
         },
+        "/student/lesson/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "This API endpoint checks the lesson of a student by their ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Student"
+                ],
+                "summary": "Check the lesson of a student",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Student ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status checked successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/student/status/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API endpoint checks the status of a student by their ID.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "student"
+                    "Student"
                 ],
                 "summary": "Check the status of a student",
                 "parameters": [
@@ -204,7 +276,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "student"
+                    "Student"
                 ],
                 "summary": "Update a student's password",
                 "parameters": [
@@ -253,6 +325,11 @@ const docTemplate = `{
         },
         "/student/updatestudent/{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API updates a student",
                 "consumes": [
                     "application/json"
@@ -261,7 +338,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "student"
+                    "Student"
                 ],
                 "summary": "Update a student",
                 "parameters": [
@@ -312,12 +389,17 @@ const docTemplate = `{
         },
         "/student/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API get by id a student",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "student"
+                    "Student"
                 ],
                 "summary": "Get by id a student",
                 "parameters": [
@@ -359,6 +441,11 @@ const docTemplate = `{
         },
         "/subject": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API returns all Subject",
                 "produces": [
                     "application/json"
@@ -395,6 +482,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This api creates a subject and returns its id",
                 "consumes": [
                     "application/json"
@@ -447,6 +539,11 @@ const docTemplate = `{
         },
         "/subject/deletsubject/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API delete a Subject",
                 "produces": [
                     "application/json"
@@ -494,6 +591,11 @@ const docTemplate = `{
         },
         "/subject/updatesubject/{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API updates a Subject",
                 "consumes": [
                     "application/json"
@@ -553,6 +655,11 @@ const docTemplate = `{
         },
         "/subject/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API get by id a subject",
                 "produces": [
                     "application/json"
@@ -600,6 +707,11 @@ const docTemplate = `{
         },
         "/teacher": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API returns all teacher",
                 "produces": [
                     "application/json"
@@ -636,6 +748,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This api creates a teacher and returns its id",
                 "consumes": [
                     "application/json"
@@ -688,6 +805,11 @@ const docTemplate = `{
         },
         "/teacher/deleteteacher/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API delete a teacher",
                 "produces": [
                     "application/json"
@@ -733,8 +855,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/teacher/lesson/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "This API endpoint checks the lesson of a teacher by their ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Teacher"
+                ],
+                "summary": "Check the lesson of a teacher",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "teacher ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status checked successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/teacher/updateteacher/{id}": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API updates a Teacher",
                 "consumes": [
                     "application/json"
@@ -794,6 +973,11 @@ const docTemplate = `{
         },
         "/teacher/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API get by id a teacher",
                 "produces": [
                     "application/json"
@@ -841,6 +1025,11 @@ const docTemplate = `{
         },
         "/timetable": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This api creates a timetable and returns its id",
                 "consumes": [
                     "application/json"
@@ -893,6 +1082,11 @@ const docTemplate = `{
         },
         "/timetable/delettimetable/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "This API delete a timetable",
                 "produces": [
                     "application/json"
@@ -1019,6 +1213,9 @@ const docTemplate = `{
                 "mail": {
                     "type": "string"
                 },
+                "password": {
+                    "type": "string"
+                },
                 "phone": {
                     "type": "string"
                 },
@@ -1052,6 +1249,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

@@ -3,8 +3,10 @@ package postgres
 import (
 	"backend_course/lms/api/models"
 	"backend_course/lms/pkg"
+	"backend_course/lms/pkg/hash"
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,11 +25,17 @@ func NewTeacher(db *pgxpool.Pool) teacherRepo {
 func (t teacherRepo) CreateTeacher(ctx context.Context,teacher models.Teacher) (string, error) {
 	id := uuid.New()
 	subjectId := uuid.New()
-	query := `INSERT INTO teacher(id,first_name,last_name,subject_id,start_work,phone,mail,created_at)
-	 VALUES($1,$2,$3,$4,$5,$6,$7,NOW())`
 
-	_, err := t.db.Exec(ctx, query, id, teacher.FirstName, teacher.LastName,
-		subjectId, teacher.StartWork, teacher.Phone, teacher.Mail)
+	hashedPassword,err:=hash.HashPassword(teacher.Password)
+	if err!=nil {
+		return "",err
+	}
+
+	query := `INSERT INTO teacher(id,first_name,last_name,subject_id,start_work,phone,mail,created_at,password)
+	 VALUES($1,$2,$3,$4,$5,$6,$7,NOW(),$8)`
+
+	_, err = t.db.Exec(ctx, query, id, teacher.FirstName, teacher.LastName,
+		subjectId, teacher.StartWork, teacher.Phone, teacher.Mail,hashedPassword)
 
 	if err != nil {
 		return "", err
@@ -37,10 +45,15 @@ func (t teacherRepo) CreateTeacher(ctx context.Context,teacher models.Teacher) (
 }
 
 func (t teacherRepo) UpdateTeacher(ctx context.Context,teacher models.Teacher) (string,error) {
-	query := `UPDATE teacher SET first_name=$1,last_name=$2,start_work=$3,phone=$4,mail=$5,updated=NOW() WHERE id=$6`
+	query := `UPDATE teacher SET first_name=$1,last_name=$2,start_work=$3,phone=$4,mail=$5,password=$6,updated=NOW() WHERE id=$7`
 
-	_, err := t.db.Exec(ctx, query, teacher.FirstName, teacher.LastName,
-		teacher.StartWork, teacher.Phone, teacher.Mail, teacher.Id)
+	hashingPassword,err:=hash.HashPassword(teacher.Password)
+	if err!=nil {
+		return "",errors.New("error while hashing")
+	}
+
+	_, err = t.db.Exec(ctx, query, teacher.FirstName, teacher.LastName,
+		teacher.StartWork, teacher.Phone, teacher.Mail,hashingPassword, teacher.Id)
 	if err != nil {
 		return "",err
 	}
@@ -163,4 +176,27 @@ func (t teacherRepo) DeleteTeacher(ctx context.Context,id string) error {
 	}
 
 	return nil
+}
+
+
+func (s *teacherRepo) CheckLessonTeacher(ctx context.Context, id string) (models.CheckLessonTeacher, error) {
+	query := `SELECT s.first_name,
+				   to_char(tt.start_date,'YYYY-MM-DD HH:MM:SS'),
+			       to_char(tt.end_date,'YYYY-MM-DD HH:MM:SS'),
+				   sub.name
+				   FROM time_tables tt INNER JOIN students s on s.id=tt.student_id
+				                       INNER JOIN subjects sub on sub.id=tt.subject_id
+									   WHERE tt.teacher_id=$1`
+
+	lessons:=models.CheckLessonTeacher{}
+
+	row:=s.db.QueryRow(ctx,query,id)
+	err:=row.Scan(&lessons.StudentName,&lessons.StartDate,&lessons.EndDate,&lessons.SubjectName)
+	if err==sql.ErrNoRows {
+		return lessons,errors.New("teacher didn't have lesson")
+	}else if err!=nil {
+		return lessons,err
+	}
+
+	return lessons,nil
 }
