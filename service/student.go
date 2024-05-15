@@ -2,6 +2,7 @@ package service
 
 import (
 	"backend_course/lms/api/models"
+	"backend_course/lms/pkg/logger"
 	"backend_course/lms/storage"
 	"context"
 	"fmt"
@@ -9,10 +10,14 @@ import (
 
 type studentService struct {
 	storage storage.IStorage
+	logger logger.ILogger
 }
 
-func NewStudentService(storage storage.IStorage) studentService {
-	return studentService{storage: storage}
+func NewStudentService(storage storage.IStorage,logger logger.ILogger) studentService {
+	return studentService{
+		storage: storage,
+		logger: logger,	
+	}
 }
 
 func (s studentService) Create(ctx context.Context,student models.Student) (string, error) {

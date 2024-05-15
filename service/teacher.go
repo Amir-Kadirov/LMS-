@@ -2,17 +2,23 @@ package service
 
 import (
 	"backend_course/lms/api/models"
+	"backend_course/lms/pkg/logger"
 	"backend_course/lms/storage"
 	"context"
 	"fmt"
 )
 
+
 type teacherService struct {
 	storage storage.IStorage
+	logger  logger.ILogger
 }
 
-func NewTeacherService(storage storage.IStorage) teacherService {
-	return teacherService{storage: storage}
+func NewTeacherService(storage storage.IStorage, logger logger.ILogger) teacherService {
+	return teacherService{
+		storage: storage,
+		logger: logger,
+	}
 }
 
 func (t teacherService) CreateTeacher(ctx context.Context,teacher models.Teacher) (string, error) {

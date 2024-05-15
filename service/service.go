@@ -1,12 +1,16 @@
 package service
 
-import "backend_course/lms/storage"
+import (
+	"backend_course/lms/pkg/logger"
+	"backend_course/lms/storage"
+)
 
 type IServiceManager interface {
 	Student() studentService
 	Teacher() teacherService
 	Subject() subjectService
 	TimeTable() timetableService
+	Auth() authService
 }
 
 type Service struct {
@@ -14,16 +18,21 @@ type Service struct {
 	teacherService teacherService
 	subjectService subjectService
 	timetableService timetableService
+	authService authService
+
+	logger logger.ILogger
 }
 
-func New(storage storage.IStorage) Service {
-	services := Service{}
-	services.studentService = NewStudentService(storage)
-	services.teacherService = NewTeacherService(storage)
-	services.subjectService = NewSubjectService(storage)
-	services.timetableService=NewTimeTableService(storage)
+func New(storage storage.IStorage,log logger.ILogger) Service {
+	return Service{
+		studentService: NewStudentService(storage,log),
+		subjectService: NewSubjectService(storage,log),
+		teacherService: NewTeacherService(storage,log),
+		timetableService: NewTimeTableService(storage,log),
+		authService: NewAuthService(storage,log),
 
-	return services
+		logger: log,
+	}
 }
 
 func (s Service) Student() studentService {
@@ -40,4 +49,8 @@ func (s Service) Subject() subjectService {
 
 func (s Service) TimeTable() timetableService {
 	return s.timetableService
+}
+
+func (s Service) Auth() authService {
+	return s.authService
 }

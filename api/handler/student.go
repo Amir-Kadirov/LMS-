@@ -4,6 +4,7 @@ import (
 	_ "backend_course/lms/api/docs"
 	"backend_course/lms/api/models"
 	"backend_course/lms/pkg/check"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -36,8 +37,18 @@ func (h Handler) CreateStudent(c *gin.Context) {
 		return
 	}
 
-	if err := check.ValidateNumber(student.Phone); err != nil {
-		handleResponse(c, h.Log, "error while validating student phone: "+student.Phone, http.StatusBadRequest, err.Error())
+	if !check.ValidateGmail(student.Mail) {
+		handleResponse(c, h.Log, "error while validation email", http.StatusBadRequest, errors.New("wrong email"))
+		return
+	}
+
+	if !check.ValidatePhone(student.Phone) {
+		handleResponse(c, h.Log, "error while validating student phone: "+student.Phone, http.StatusBadRequest, errors.New("wrong phone for country Uzb"))
+		return
+	}
+
+	if !check.ValidatePassword(student.Pasword) {
+		handleResponse(c, h.Log, "error while validating student password", http.StatusBadRequest, errors.New("unsecure password"))
 		return
 	}
 
@@ -71,6 +82,21 @@ func (h Handler) UpdateStudent(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&student); err != nil {
 		handleResponse(c, h.Log, "error while reading request body", http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if !check.ValidateGmail(student.Mail) {
+		handleResponse(c, h.Log, "error while validation email", http.StatusBadRequest, errors.New("wrong email"))
+		return
+	}
+
+	if !check.ValidatePhone(student.Phone) {
+		handleResponse(c, h.Log, "error while validating teacher phone: "+student.Phone, http.StatusBadRequest, errors.New("wrong phone for country Uzb"))
+		return
+	}
+
+	if !check.ValidatePassword(student.Pasword) {
+		handleResponse(c, h.Log, "error while validating student password", http.StatusBadRequest, errors.New("unsecure password"))
 		return
 	}
 

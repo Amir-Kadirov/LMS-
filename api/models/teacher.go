@@ -8,7 +8,7 @@ type Teacher struct {
 	StartWork string `json:"start_work"`
 	Mail      string `json:"mail"`
 	Phone     string `json:"phone"`
-	Password string `json:"password"`
+	Password  string `json:"password"`
 }
 
 type GetAllTeacherResponse struct {
@@ -17,13 +17,13 @@ type GetAllTeacherResponse struct {
 }
 
 type TeacherStudent struct {
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 type TeacherSubjects struct {
-	Type        string `json:"type"`
-	Name      string `josn:"name"`
+	Type string `json:"type"`
+	Name string `josn:"name"`
 }
 
 type GetByIdTeacher struct {
@@ -44,10 +44,15 @@ type TeacherTimeTable struct {
 	EndDate   string `json:"end_date"`
 }
 
+type SliceTeacherStudents struct {
+	Age  int    `json:"age"`
+	Name string `json:"name"`
+}
 
 type CheckLessonTeacher struct {
-	StudentName string `json:"teacher_name"`
-	StartDate   string `json:"start_date"`
-	EndDate     string `json:"end_date"`
-	SubjectName string `json:"subject_name"`
+	StudentName string                 `json:"teacher_name"`
+	StartDate   string                 `json:"start_date"`
+	EndDate     string                 `json:"end_date"`
+	SubjectName string                 `json:"subject_name"`
+	Student     []SliceTeacherStudents `json:"students"`
 }

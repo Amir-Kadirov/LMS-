@@ -17,7 +17,7 @@ type StudentStorage interface {
 	Create(ctx context.Context,student models.Student) (string, error)
 	GetAll(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllStudentsResponse, error)
 	UpdateSt(ctx context.Context,student models.Student) (string, error)
-	GetById(ctx context.Context,ExternalId string) (models.GetStudent, error)
+	GetById(ctx context.Context,id string) (models.GetStudent, error)
 	DeleteSt(ctx context.Context,external_id string) error
 	StatusSt(ctx context.Context,id string) (models.IsActiveResponse, error)
 	CheckLessonStudent(ctx context.Context, id string) (models.CheckLessonStudent, error)
@@ -30,7 +30,7 @@ type TeacherStorage interface {
 	GetTeacherbyId(ctx context.Context,id string) (models.GetByIdTeacher, error)
 	DeleteTeacher(ctx context.Context,id string) error
 	CheckLessonTeacher(ctx context.Context, id string) (models.CheckLessonTeacher, error)
-	
+	GetTeacherbyLogin(ctx context.Context,login string) (models.Teacher, error)
 }
 
 type SubjectStorage interface {

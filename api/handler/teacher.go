@@ -4,6 +4,7 @@ import (
 	_ "backend_course/lms/api/docs"
 	"backend_course/lms/api/models"
 	"backend_course/lms/pkg/check"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -31,8 +32,18 @@ func (h Handler) CreateTeacher(c *gin.Context) {
 		return
 	}
 
-	if err := check.ValidateNumber(teacher.Phone); err != nil {
-		handleResponse(c, h.Log, "error while validating teacher phone: "+teacher.Phone, http.StatusBadRequest, err.Error())
+	if !check.ValidatePhone(teacher.Phone) {
+		handleResponse(c, h.Log, "error while validating teacher phone: "+teacher.Phone, http.StatusBadRequest, errors.New("wrong phone for country Uzb"))
+		return
+	}
+
+	if !check.ValidateGmail(teacher.Mail) {
+		handleResponse(c, h.Log, "error while validation email", http.StatusBadRequest, errors.New("wrong email"))
+		return
+	}
+
+	if !check.ValidatePassword(teacher.Password) {
+		handleResponse(c, h.Log, "error while validating teacher password", http.StatusBadRequest, errors.New("unsecure password"))
 		return
 	}
 
@@ -64,14 +75,35 @@ func (h Handler) UpdateTeacher(c *gin.Context) {
 
 	teacher := models.Teacher{}
 
+	_, err := getAuthInfo(c)
+	if err != nil {
+		handleResponse(c, h.Log, "unauthorized", http.StatusUnauthorized, err.Error())
+		return
+	}
+
 	if err := c.ShouldBindJSON(&teacher); err != nil {
 		handleResponse(c, h.Log, "error while reading request body", http.StatusBadRequest, err.Error())
 		return
 	}
 
+	if !check.ValidatePhone(teacher.Phone) {
+		handleResponse(c, h.Log, "error while validating teacher phone: "+teacher.Phone, http.StatusBadRequest, errors.New("wrong phone for country Uzb"))
+		return
+	}
+
+	if !check.ValidateGmail(teacher.Mail) {
+		handleResponse(c, h.Log, "error while validation email", http.StatusBadRequest, errors.New("wrong email"))
+		return
+	}
+
+	if !check.ValidatePassword(teacher.Password) {
+		handleResponse(c, h.Log, "error while validating teacher password", http.StatusBadRequest, errors.New("unsecure password"))
+		return
+	}
+
 	teacher.Id = id
 
-	err := h.Service.Teacher().UpdateTeacher(c.Request.Context(), teacher)
+	err = h.Service.Teacher().UpdateTeacher(c.Request.Context(), teacher)
 	if err != nil {
 		handleResponse(c, h.Log, fmt.Sprintf("error while updating teacher %s", teacher.Id), http.StatusInternalServerError, err.Error())
 		return

@@ -1,4 +1,18 @@
 definitions:
+  models.LoginRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  models.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
   models.Response:
     properties:
       data: {}
@@ -273,42 +287,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Check the status of a student
-      tags:
-      - Student
-  /student/updatepassword/{id}/{password}:
-    put:
-      description: This API endpoint updates a student's password by their ID.
-      parameters:
-      - description: Student ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: New Password
-        in: path
-        name: password
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Password updated successfully
-          schema:
-            $ref: '#/definitions/models.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Response'
-      summary: Update a student's password
       tags:
       - Student
   /student/updatestudent/{id}:
@@ -682,6 +660,40 @@ paths:
       summary: Check the lesson of a teacher
       tags:
       - Teacher
+  /teacher/login:
+    post:
+      consumes:
+      - application/json
+      description: Teacher login
+      parameters:
+      - description: login
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Teacher login
+      tags:
+      - auth
   /teacher/updateteacher/{id}:
     put:
       consumes:

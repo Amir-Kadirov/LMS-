@@ -10,4 +10,9 @@ const (
 	SmtpPort            = "587"
 	SmtpUsername        = "amirjonqodirov28@gmail.com"
 	SmtpPassword        = "bgwc hetf jyxo otkk"
+	
+	TEACHER_TYPE = "teacher"
+	STUDENT_TYPE = "student"
 )
+
+var SignedKey = []byte(`AtRdbumqoPjbcNjNhBgtmdAnRJyPQVXjwMPNYNbv`)

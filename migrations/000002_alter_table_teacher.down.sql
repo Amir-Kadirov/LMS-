@@ -1,2 +1,2 @@
-ALTER TABLE IF EXISTS teacher
-    DROP COLUMN IF EXISTS is_blocked;
+ALTER TABLE IF NOT EXISTS teacher
+    DROP COLUMN IF NOT EXISTS is_blocked;

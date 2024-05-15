@@ -2,17 +2,23 @@ package service
 
 import (
 	"backend_course/lms/api/models"
+	"backend_course/lms/pkg/logger"
 	"backend_course/lms/storage"
 	"context"
 	"fmt"
 )
 
+
 type timetableService struct {
 	storage storage.IStorage
+	logger  logger.ILogger
 }
 
-func NewTimeTableService(storage storage.IStorage) timetableService {
-	return timetableService{storage: storage}
+func NewTimeTableService(storage storage.IStorage, logger logger.ILogger) timetableService {
+	return timetableService{
+		storage: storage,
+		logger: logger,
+	}
 }
 
 func (t timetableService) CreateTimeTable(ctx context.Context,timetable models.TimeTable) (string, error) {

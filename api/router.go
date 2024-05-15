@@ -4,7 +4,7 @@ import (
 	"backend_course/lms/api/handler"
 	"backend_course/lms/pkg/logger"
 	"backend_course/lms/service"
-	"net/http"
+	// "net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -25,7 +25,7 @@ func New(service service.IServiceManager, log logger.ILogger) *gin.Engine {
 	r := gin.Default()
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.Use(authMiddleware)
+	// r.Use(authMiddleware)
 
 	r.POST("/student", h.CreateStudent)
 	r.GET("/student", h.GetAllStudents)
@@ -41,6 +41,7 @@ func New(service service.IServiceManager, log logger.ILogger) *gin.Engine {
 	r.GET("/teacher/:id", h.GetByIdTeacher)
 	r.DELETE("/teacher/deleteteacher/:id", h.DeleteTeacher)
 	r.GET("/teacher/lesson/:id",h.TeacherLesson)
+	r.POST("/teacher/login",h.TeacherLogin)
 
 	r.POST("/subject", h.CreateSubject)
 	r.GET("/subject/:id", h.GetbyIdSubject)
@@ -54,10 +55,10 @@ func New(service service.IServiceManager, log logger.ILogger) *gin.Engine {
 	return r
 }
 
-func authMiddleware(c *gin.Context) {
-	if c.GetHeader("Authorization") != "secret" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-	c.Next()
-}
+// func authMiddleware(c *gin.Context) {
+// 	if c.GetHeader("Authorization") != "secret" {
+// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+// 		return
+// 	}
+// 	c.Next()
+// }

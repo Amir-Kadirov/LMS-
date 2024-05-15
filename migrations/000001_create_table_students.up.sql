@@ -12,6 +12,11 @@ CREATE TABLE IF NOT EXISTS students (
   active boolean
 );
 
-
-ALTER TABLE students
+ALTER TABLE IF EXISTS students
 ALTER COLUMN pasword TYPE varchar;
+
+ALTER TABLE IF EXISTS students
+ADD CONSTRAINT unique_phone UNIQUE (phone);
+
+ALTER TABLE IF EXISTS students
+ADD CONSTRAINT unique_mail UNIQUE (mail);

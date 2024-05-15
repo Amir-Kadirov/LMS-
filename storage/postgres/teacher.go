@@ -22,20 +22,20 @@ func NewTeacher(db *pgxpool.Pool) teacherRepo {
 	}
 }
 
-func (t teacherRepo) CreateTeacher(ctx context.Context,teacher models.Teacher) (string, error) {
+func (t teacherRepo) CreateTeacher(ctx context.Context, teacher models.Teacher) (string, error) {
 	id := uuid.New()
 	subjectId := uuid.New()
 
-	hashedPassword,err:=hash.HashPassword(teacher.Password)
-	if err!=nil {
-		return "",err
+	hashedPassword, err := hash.HashPassword(teacher.Password)
+	if err != nil {
+		return "", err
 	}
 
 	query := `INSERT INTO teacher(id,first_name,last_name,subject_id,start_work,phone,mail,created_at,password)
 	 VALUES($1,$2,$3,$4,$5,$6,$7,NOW(),$8)`
 
 	_, err = t.db.Exec(ctx, query, id, teacher.FirstName, teacher.LastName,
-		subjectId, teacher.StartWork, teacher.Phone, teacher.Mail,hashedPassword)
+		subjectId, teacher.StartWork, teacher.Phone, teacher.Mail, hashedPassword)
 
 	if err != nil {
 		return "", err
@@ -44,25 +44,24 @@ func (t teacherRepo) CreateTeacher(ctx context.Context,teacher models.Teacher) (
 	return id.String(), nil
 }
 
-func (t teacherRepo) UpdateTeacher(ctx context.Context,teacher models.Teacher) (string,error) {
+func (t teacherRepo) UpdateTeacher(ctx context.Context, teacher models.Teacher) (string, error) {
 	query := `UPDATE teacher SET first_name=$1,last_name=$2,start_work=$3,phone=$4,mail=$5,password=$6,updated=NOW() WHERE id=$7`
 
-	hashingPassword,err:=hash.HashPassword(teacher.Password)
-	if err!=nil {
-		return "",errors.New("error while hashing")
+	hashingPassword, err := hash.HashPassword(teacher.Password)
+	if err != nil {
+		return "", errors.New("error while hashing")
 	}
 
 	_, err = t.db.Exec(ctx, query, teacher.FirstName, teacher.LastName,
-		teacher.StartWork, teacher.Phone, teacher.Mail,hashingPassword, teacher.Id)
+		teacher.StartWork, teacher.Phone, teacher.Mail, hashingPassword, teacher.Id)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 
-
-	return teacher.Id,nil
+	return teacher.Id, nil
 }
 
-func (t teacherRepo) GetAllTeacher(ctx context.Context,req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error) {
+func (t teacherRepo) GetAllTeacher(ctx context.Context, req models.GetAllStudentsRequest) (models.GetAllTeacherResponse, error) {
 	resp := models.GetAllTeacherResponse{}
 	filter := ""
 	offest := (req.Page - 1) * req.Limit
@@ -114,7 +113,7 @@ func (t teacherRepo) GetAllTeacher(ctx context.Context,req models.GetAllStudents
 	return resp, nil
 }
 
-func (t teacherRepo) GetTeacherbyId(ctx context.Context,id string) (models.GetByIdTeacher, error) {
+func (t teacherRepo) GetTeacherbyId(ctx context.Context, id string) (models.GetByIdTeacher, error) {
 	resp := models.GetByIdTeacher{}
 	query := `SELECT id,
 	first_name,
@@ -147,7 +146,7 @@ func (t teacherRepo) GetTeacherbyId(ctx context.Context,id string) (models.GetBy
 		return resp, err
 	}
 	for rows.Next() {
-		student:=models.TeacherStudent{}
+		student := models.TeacherStudent{}
 		subject := models.TeacherSubjects{}
 		timetable := models.TeacherTimeTable{}
 		if err := rows.Scan(
@@ -164,10 +163,10 @@ func (t teacherRepo) GetTeacherbyId(ctx context.Context,id string) (models.GetBy
 		resp.TimeTable = append(resp.TimeTable, timetable)
 		resp.Student = append(resp.Student, student)
 	}
-	return resp,nil
+	return resp, nil
 }
 
-func (t teacherRepo) DeleteTeacher(ctx context.Context,id string) error {
+func (t teacherRepo) DeleteTeacher(ctx context.Context, id string) error {
 	query := `DELETE FROM teacher WHERE id=$1`
 
 	_, err := t.db.Exec(ctx, query, id)
@@ -178,9 +177,9 @@ func (t teacherRepo) DeleteTeacher(ctx context.Context,id string) error {
 	return nil
 }
 
-
 func (s *teacherRepo) CheckLessonTeacher(ctx context.Context, id string) (models.CheckLessonTeacher, error) {
 	query := `SELECT s.first_name,
+	               s.age,
 				   to_char(tt.start_date,'YYYY-MM-DD HH:MM:SS'),
 			       to_char(tt.end_date,'YYYY-MM-DD HH:MM:SS'),
 				   sub.name
@@ -188,15 +187,57 @@ func (s *teacherRepo) CheckLessonTeacher(ctx context.Context, id string) (models
 				                       INNER JOIN subjects sub on sub.id=tt.subject_id
 									   WHERE tt.teacher_id=$1`
 
-	lessons:=models.CheckLessonTeacher{}
+	resp := models.CheckLessonTeacher{}
 
-	row:=s.db.QueryRow(ctx,query,id)
-	err:=row.Scan(&lessons.StudentName,&lessons.StartDate,&lessons.EndDate,&lessons.SubjectName)
-	if err==sql.ErrNoRows {
-		return lessons,errors.New("teacher didn't have lesson")
-	}else if err!=nil {
-		return lessons,err
+	row, err := s.db.Query(ctx, query, id)
+
+	if err == sql.ErrNoRows {
+		return resp, errors.New("teacher didn't have lesson")
+	} else if err != nil {
+		return resp, err
 	}
 
-	return lessons,nil
+	for row.Next() {
+		student := models.SliceTeacherStudents{}
+		if err = row.Scan(&student.Name,
+			&student.Age,
+			&resp.StartDate,
+			&resp.EndDate,
+			&resp.SubjectName); err != nil {
+			return resp, err
+		}
+		resp.Student = append(resp.Student, student)
+	}
+
+	return resp, nil
+}
+
+func (t teacherRepo) GetTeacherbyLogin(ctx context.Context, login string) (models.Teacher, error) {
+	resp := models.Teacher{}
+	query := `SELECT 
+	id,
+	first_name,
+	last_name,
+	subject_id,
+	start_work,
+	phone,
+	mail,
+	password
+       FROM teacher 
+	WHERE mail=$1`
+
+	row := t.db.QueryRow(ctx, query, login)
+	err := row.Scan(&resp.Id,
+		&resp.FirstName,
+		&resp.LastName,
+		&resp.SubjectId,
+		&resp.StartWork,
+		&resp.Phone,
+		&resp.Mail,
+		&resp.Password)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
 }

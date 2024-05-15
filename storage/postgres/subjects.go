@@ -114,7 +114,7 @@ func (t subjectRepo) GetAllSubject(ctx context.Context,req models.GetAllStudents
 		resp.Subject=append(resp.Subject,Subject)
 	}
 
-	err = t.db.QueryRow(ctx, `SELECT count(*) from Subject WHERE TRUE `+filter+``).Scan(&resp.Count)
+	err = t.db.QueryRow(ctx, `SELECT count(*) from subjects WHERE TRUE `+filter+``).Scan(&resp.Count)
 	if err != nil {
 		return resp, err
 	}

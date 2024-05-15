@@ -15,3 +15,9 @@ ALTER COLUMN start_work TYPE varchar(50);
 
 ALTER TABLE IF EXISTS teacher
 ADD COLUMN password varchar;
+
+ALTER TABLE IF EXISTS teacher
+ADD CONSTRAINT unique_t_phone UNIQUE (phone);
+
+ALTER TABLE IF EXISTS teacher
+ADD CONSTRAINT unique_t_mail UNIQUE (mail);
