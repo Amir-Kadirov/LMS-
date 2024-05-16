@@ -6,17 +6,21 @@ import (
 	"backend_course/lms/pkg/logger"
 	"backend_course/lms/service"
 	"backend_course/lms/storage/postgres"
+	"backend_course/lms/storage/redis"
 	"context"
 	"fmt"
 )
 
 func main() {
 	cfg := config.Load()
-	store, err := postgres.New(context.Background(), cfg)
+	newRedis := redis.New(cfg)
+
+	store, err := postgres.New(context.Background(), cfg, newRedis)
 	if err != nil {
 		fmt.Println("error while connecting db, err: ", err)
 		return
 	}
+
 	defer store.CloseDB()
 
 	

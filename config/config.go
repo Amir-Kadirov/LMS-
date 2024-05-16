@@ -14,7 +14,12 @@ type Config struct {
 	PostgresPassword string
 	PostgresUser     string
 	PostgresDatabase string
+
 	ServiceName      string
+
+	RedisHost     string
+	RedisPort     string
+	RedisPassword string
 }
 
 func Load() Config {
@@ -30,6 +35,10 @@ func Load() Config {
 	cfg.PostgresUser = cast.ToString(getOrReturnDefault("POSTGRES_USER", "postgres"))
 	cfg.PostgresPassword = cast.ToString(getOrReturnDefault("POSTGRES_PASSWORD", "Amir2414"))
 	cfg.ServiceName = "LMS"
+
+	cfg.RedisHost = "localhost" //cast.ToString(getOrReturnDefault("REDIS_HOST", "localhost"))
+	cfg.RedisPort = "6379"      //cast.ToString(getOrReturnDefault("REDIS_PORT", "6379"))
+	cfg.RedisPassword = cast.ToString(getOrReturnDefault("REDIS_PASSWORD", "password"))
 
 	return cfg
 }

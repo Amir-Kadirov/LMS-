@@ -3,6 +3,7 @@ package storage
 import (
 	"backend_course/lms/api/models"
 	"context"
+	"time"
 )
 
 type IStorage interface {
@@ -11,6 +12,7 @@ type IStorage interface {
 	TeacherStorage() TeacherStorage
 	SubjectStorage() SubjectStorage
 	TimeTableStorage() TimeTableStorage
+	Redis() IRedisStorage
 }
 
 type StudentStorage interface {
@@ -44,4 +46,10 @@ type SubjectStorage interface {
 type TimeTableStorage interface {
 	DeleteTimeTable(ctx context.Context,id string) error
 	CreateTimeTable(ctx context.Context,timeTable models.TimeTable) (string, error)
+}
+
+type IRedisStorage interface {
+	SetX(ctx context.Context, key string, value interface{}, duration time.Duration) error
+	Get(ctx context.Context, key string) interface{}
+	Del(ctx context.Context, key string) error
 }

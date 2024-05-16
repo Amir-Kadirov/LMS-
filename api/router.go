@@ -42,6 +42,10 @@ func New(service service.IServiceManager, log logger.ILogger) *gin.Engine {
 	r.DELETE("/teacher/deleteteacher/:id", h.DeleteTeacher)
 	r.GET("/teacher/lesson/:id",h.TeacherLesson)
 	r.POST("/teacher/login",h.TeacherLogin)
+	r.POST("/teacher/register",h.TeacherRegister)
+	r.POST("/teacher/register-confirm",h.TeacherRegisterConfirm)
+	r.POST("/teacher/loginbymail",h.TeacherLoginByMail)
+	r.POST("/teacher/login-confirm",h.TeacherLoginConfirm)
 
 	r.POST("/subject", h.CreateSubject)
 	r.GET("/subject/:id", h.GetbyIdSubject)
