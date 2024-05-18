@@ -60,3 +60,36 @@ func (h Handler) DeleteTimeTable(c *gin.Context) {
 
 	handleResponse(c, h.Log, "Time Table deleted successfully", http.StatusOK, err)
 }
+
+// @Security ApiKeyAuth
+// @Router		/timetable/studentsattandence [post]
+// @Summary		get students attandence
+// @Description	This api get students attandence 
+// @Tags		TimeTable
+// @Accept		json
+// @Produce		json
+// @Param		timetable body models.GetAllStudentsAttandenceReportRequest true "Attanddence Students"
+// @Success		200  {object}  models.Response
+// @Failure		400  {object}  models.Response
+// @Failure		404  {object}  models.Response
+// @Failure		500  {object}  models.Response
+func (h Handler) GetAllStudentsAttandenceReport(c *gin.Context) {
+	req := models.GetAllStudentsAttandenceReportRequest{}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		handleResponse(c, h.Log, "error while reading request body", http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := h.Service.TimeTable().GetAllStudentsAttandenceReport(c.Request.Context(), req)
+	if err != nil {
+		handleResponse(c, h.Log, "error while get attandence students", http.StatusBadRequest, err.Error())
+		return
+	}
+
+	handleResponse(c, h.Log, "Getted successfully", http.StatusOK, id)
+}
+/*
+git merch
+git workflow
+	*/

@@ -1,4 +1,19 @@
 definitions:
+  models.GetAllStudentsAttandenceReportRequest:
+    properties:
+      end_date:
+        type: string
+      limit:
+        type: integer
+      page:
+        type: integer
+      start_date:
+        type: string
+      student_id:
+        type: string
+      teacher_id:
+        type: string
+    type: object
   models.LoginRequest:
     properties:
       login:
@@ -52,6 +67,17 @@ definitions:
       pasword:
         type: string
       phone:
+        type: string
+      student_phones:
+        items:
+          $ref: '#/definitions/models.StudentNumbers'
+        type: array
+    type: object
+  models.StudentNumbers:
+    properties:
+      phone:
+        type: string
+      student_id:
         type: string
     type: object
   models.Subjects:
@@ -957,6 +983,42 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Delete a timetable
+      tags:
+      - TimeTable
+  /timetable/studentsattandence:
+    post:
+      consumes:
+      - application/json
+      description: This api get students attandence
+      parameters:
+      - description: Attanddence Students
+        in: body
+        name: timetable
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetAllStudentsAttandenceReportRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: get students attandence
       tags:
       - TimeTable
 securityDefinitions:

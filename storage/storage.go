@@ -46,6 +46,7 @@ type SubjectStorage interface {
 type TimeTableStorage interface {
 	DeleteTimeTable(ctx context.Context,id string) error
 	CreateTimeTable(ctx context.Context,timeTable models.TimeTable) (string, error)
+	GetAllStudentsAttandenceReport(ctx context.Context, req models.GetAllStudentsAttandenceReportRequest) (models.GetAllStudentsAttandenceReportResponse, error)
 }
 
 type IRedisStorage interface {

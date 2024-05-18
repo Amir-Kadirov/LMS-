@@ -41,3 +41,13 @@ func (t timetableService) DeleteTimeTable(ctx context.Context,id string) error {
 
 	return nil
 }
+
+
+func (s timetableService) GetAllStudentsAttandenceReport(ctx context.Context, req models.GetAllStudentsAttandenceReportRequest) (models.GetAllStudentsAttandenceReportResponse, error) {
+	resp, err := s.storage.TimeTableStorage().GetAllStudentsAttandenceReport(ctx, req)
+
+	if err != nil {
+		return resp, err
+	}
+	return resp, nil
+}

@@ -12,6 +12,13 @@ CREATE TABLE IF NOT EXISTS students (
   active boolean
 );
 
+CREATE TABLE IF NOT EXISTS student_numbers (
+  phone varchar NOT NULL,
+  student_id uuid REFERENCES students (id),
+  created_at timestamp NOT NULL DEFAULT NOW(),
+  updated_at timestamp
+)
+
 ALTER TABLE IF EXISTS students
 ALTER COLUMN pasword TYPE varchar;
 

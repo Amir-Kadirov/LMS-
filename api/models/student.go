@@ -10,6 +10,7 @@ type Student struct {
 	Mail       string `json:"mail"`
 	Pasword    string `json:"pasword"`
 	Active     bool   `json:"active"`
+	Phones     []StudentNumbers`json:"student_phones"`
 }
 
 type StudentTimeTable struct {
@@ -41,6 +42,12 @@ type GetStudent struct {
 	Teacher    []StudentTeacher   `json:"teacher"`
 	TimeTable  []StudentTimeTable `json:"time_table"`
 	Subjects   []StudentSubjects  `json:"subjects"`
+	Phones     []StudentNumbers   `json:"student_phones"`
+}
+
+type StudentNumbers struct {
+	Phone     string `json:"phone"`
+	StudentId string `json:"student_id"`
 }
 
 type GetAllStudentsRequest struct {
@@ -64,3 +71,27 @@ type CheckLessonStudent struct {
 	EndDate     string `json:"end_date"`
 	SubjectName string `json:"subject_name"`
 }
+
+type GetAllStudentsAttandenceReportRequest struct {
+	StudentId string `json:"student_id"`
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
+	TeacherId string `json:"teacher_id"`
+	Page      uint64 `json:"page"`
+	Limit     uint64 `json:"limit"`
+}
+
+type GetAllStudentsAttandenceReportResponse struct {
+	Students []StudentAttandenceReport `json:"students"`
+	Count    int64                     `json:"count"`
+}
+
+type StudentAttandenceReport struct {
+	StudentId        string  `json:"student_id"`
+	StudentName      string  `json:"student_name"`
+	StudentCreatedAt string  `json:"student_created_at"`
+	TeacherName      string  `json:"teacher_name"`
+	StudyTime        float64 `json:"study_time"`
+	AvgStudyTime     float64 `json:"avg_study_time"`
+}
+

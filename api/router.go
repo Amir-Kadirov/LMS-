@@ -55,6 +55,7 @@ func New(service service.IServiceManager, log logger.ILogger) *gin.Engine {
 
 	r.POST("/timetable", h.CreateTimeTable)
 	r.DELETE("/timetable/:id", h.DeleteTimeTable)
+	r.POST("/timetable/studentsattandence",h.GetAllStudentsAttandenceReport)
 
 	return r
 }
